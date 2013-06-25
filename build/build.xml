@@ -249,13 +249,13 @@
 		<antcall target="build-addon"><param name="addon" value="saml"/></antcall>
 
 		<!-- 'Non-Standard' addons, ie which require additional files (keep in alphabetical order ;) -->
-		<antcall target="build-fuzzdb"/>
+		<!--<antcall target="build-fuzzdb"/>-->
 		
 		<!-- Examples, which havnt been made into addons yet -->
-		<antcall target="build-exampleActiveScan"/>
-		<antcall target="build-examplePassiveScan"/>
-		<antcall target="build-exampleRightClickMsg"/>
-		<antcall target="build-exampleTopMenu"/>
+		<!--<antcall target="build-exampleActiveScan"/>-->
+		<!--<antcall target="build-examplePassiveScan"/>-->
+		<!--<antcall target="build-exampleRightClickMsg"/>-->
+		<!--<antcall target="build-exampleTopMenu"/>-->
 
 		<echo file="${versions.file}" append="true">&lt;/ZAP></echo>
 	</target>
