@@ -4,9 +4,16 @@ import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.control.Control;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
+import org.parosproxy.paros.extension.ExtensionPopupMenuItem;
 import org.parosproxy.paros.extension.SessionChangedListener;
+import org.parosproxy.paros.extension.manualrequest.ManualRequestEditorDialog;
+import org.parosproxy.paros.extension.manualrequest.http.impl.ManualHttpRequestEditorDialog;
+import org.parosproxy.paros.model.HistoryReference;
 import org.parosproxy.paros.model.Session;
+import org.zaproxy.zap.extension.ExtensionPopupMenu;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -29,9 +36,14 @@ public class SAMLExtension extends ExtensionAdaptor implements SessionChangedLis
     @Override
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
-//        extensionHook.addProxyListener(new SAMLProxyListener());
-//        extensionHook.addSessionListener(this);
-        System.out.println("Started SAML extension");
+
+        if (getView() != null) {
+            ExtensionPopupMenu samlMenu = new ExtensionPopupMenu("SAML Actions");
+            ExtensionPopupMenuItem samlResendMenuItem = new SAMLResendMenuItem("Resend...");
+
+            samlMenu.add(samlResendMenuItem);
+            extensionHook.getHookMenu().addPopupMenuItem(samlMenu);
+        }
 
     }
 
