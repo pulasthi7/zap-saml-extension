@@ -5,6 +5,8 @@ import org.parosproxy.paros.network.HttpMessage;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 public class SAMLRequestEditor{
     private JPanel samlEditorPanel;
@@ -66,16 +68,56 @@ public class SAMLRequestEditor{
      */
     public void setMessage(HttpMessage httpMessage){
         StringBuilder requestHeader = new StringBuilder();
+
         for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
-            requestHeader.append(urlParameter.getName()).append(" : ").append(urlParameter.getValue()).append("\n");
+            requestHeader.append(urlParameter.getName()).append(" : ");
+            if(urlParameter.getName().equals("SAMLRequest")||urlParameter.getName().equals("SAMLResponse")){
+                requestHeader.append(extractSAMLMessage(urlParameter.getValue(),Binding.HTTPRedirect));  //decode and show the saml message
+            } else {
+                requestHeader.append(urlParameter.getValue());  //show the raw parameter
+            }
+            requestHeader.append("\n");
         }
         StringBuilder requestParams = new StringBuilder();
         for (HtmlParameter formParameter : httpMessage.getFormParams()) {
-            requestParams.append(formParameter.getName()).append(" : ").append(formParameter.getValue()).append("\n");
+            requestParams.append(formParameter.getName()).append(" : ");
+            if(formParameter.getName().equals("SAMLRequest")||formParameter.getName().equals("SAMLResponse")){
+                requestParams.append(extractSAMLMessage(formParameter.getValue(),Binding.HTTPPost));  //decode and show the saml
+                // message
+            } else {
+                requestParams.append(formParameter.getValue());  //show the raw parameter
+            }
+            requestParams.append("\n");
         }
         requestHeaderTextArea.setText(requestHeader.toString());
         requestBodyTextArea.setText(requestParams.toString());
     }
+
+    /**
+     * Decode the SAML messages based on the binding used
+     * @param val the SAML message to decode
+     * @param binding The binding used
+     * @return The decoded SAML message if success, or the original string if failed
+     */
+    private String extractSAMLMessage(String val, Binding binding){
+        try {
+            switch (binding) {
+                case HTTPPost:
+                    val = URLDecoder.decode(val,"UTF-8");
+                case HTTPRedirect:
+                    byte[] b64decoded = SAMLUtils.b64Decode(val);
+                    return SAMLUtils.inflateMessage(b64decoded);
+                default:
+                    break;
+            }
+        } catch (UnsupportedEncodingException e) {
+
+        } catch (SAMLException e) {
+
+        }
+        return val;
+    }
+
 
     /**
      * Shows the extension UI
