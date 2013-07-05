@@ -19,6 +19,8 @@ public class SAMLRequestEditor{
     private JTextArea requestBodyTextArea;
     private JTextArea requestHeaderTextArea;
     private JSplitPane requestSplitPane;
+    private JScrollPane requestHeaderPane;
+    private JScrollPane requestBodyPane;
 
     public SAMLRequestEditor() throws HeadlessException {
         init();
@@ -38,6 +40,8 @@ public class SAMLRequestEditor{
         responsePanel = new JPanel();
         responseSplitPane = new JSplitPane();
         requestSplitPane = new JSplitPane();
+        requestBodyPane = new JScrollPane(requestBodyTextArea);
+        requestHeaderPane = new JScrollPane(requestHeaderTextArea);
 
         samlEditorPanel.setLayout(new BorderLayout());
         samlEditorPanel.add(tabbedPane1RequestResponse);
@@ -53,9 +57,10 @@ public class SAMLRequestEditor{
         responseSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         requestSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
-        requestSplitPane.setTopComponent(requestHeaderTextArea);
-        requestSplitPane.setBottomComponent(requestBodyTextArea);
+        requestSplitPane.setTopComponent(requestHeaderPane);
+        requestSplitPane.setBottomComponent(requestBodyPane);
         requestSplitPane.setResizeWeight(0.5);
+
 
         responseSplitPane.setTopComponent(responseHeaderTextArea);
         responseSplitPane.setBottomComponent(responseBodyTextArea);
