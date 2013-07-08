@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SAMLRequestEditor{
     private JPanel samlEditorPanel;
@@ -16,11 +18,16 @@ public class SAMLRequestEditor{
     private JPanel requestPanel;
     private JPanel responsePanel;
     private JSplitPane responseSplitPane;
-    private JTextArea requestBodyTextArea;
-    private JTextArea requestHeaderTextArea;
-    private JSplitPane requestSplitPane;
-    private JScrollPane requestHeaderPane;
-    private JScrollPane requestBodyPane;
+    private JTextArea requestTextArea;
+    private JScrollPane requestScrollPane;
+    private JPanel headerPanel;
+    private JButton sendButton;
+    private JButton editOtherParamButton;
+
+    private Map<String,String> getParams;
+    private Map<String,String> postParams;
+    private Binding samlBinding;
+
 
     public SAMLRequestEditor() throws HeadlessException {
         init();
@@ -32,16 +39,13 @@ public class SAMLRequestEditor{
     protected void init(){
         samlEditorPanel = new JPanel();
         tabbedPane1RequestResponse = new JTabbedPane();
-        requestBodyTextArea = new JTextArea();
+        requestTextArea = new JTextArea();
         responseBodyTextArea = new JTextArea();
-        requestHeaderTextArea = new JTextArea();
         responseHeaderTextArea = new JTextArea();
         requestPanel = new JPanel();
         responsePanel = new JPanel();
         responseSplitPane = new JSplitPane();
-        requestSplitPane = new JSplitPane();
-        requestBodyPane = new JScrollPane(requestBodyTextArea);
-        requestHeaderPane = new JScrollPane(requestHeaderTextArea);
+        requestScrollPane = new JScrollPane(requestTextArea);
 
         samlEditorPanel.setLayout(new BorderLayout());
         samlEditorPanel.add(tabbedPane1RequestResponse);
@@ -51,20 +55,22 @@ public class SAMLRequestEditor{
         requestPanel.setLayout(new BorderLayout());
         responsePanel.setLayout(new BorderLayout());
 
-        requestPanel.add(requestSplitPane);
+        headerPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        sendButton = new JButton("Resend");
+        editOtherParamButton = new JButton("Edit other parameters");
+        headerPanel.add(sendButton);
+        headerPanel.add(editOtherParamButton);
+        requestPanel.add(headerPanel,BorderLayout.PAGE_START);
+        requestPanel.add(requestScrollPane,BorderLayout.CENTER);
+
         responsePanel.add(responseSplitPane);
-
-        responseSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-        requestSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-
-        requestSplitPane.setTopComponent(requestHeaderPane);
-        requestSplitPane.setBottomComponent(requestBodyPane);
-        requestSplitPane.setResizeWeight(0.5);
-
 
         responseSplitPane.setTopComponent(responseHeaderTextArea);
         responseSplitPane.setBottomComponent(responseBodyTextArea);
         responseSplitPane.setResizeWeight(0.5);
+
+        getParams = new HashMap<>();
+        postParams = new HashMap<>();
     }
 
     /**
@@ -72,30 +78,23 @@ public class SAMLRequestEditor{
      * @param httpMessage The message that was exchanged
      */
     public void setMessage(HttpMessage httpMessage){
-        StringBuilder requestHeader = new StringBuilder();
-
         for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
-            requestHeader.append(urlParameter.getName()).append(" : ");
             if(urlParameter.getName().equals("SAMLRequest")||urlParameter.getName().equals("SAMLResponse")){
-                requestHeader.append(extractSAMLMessage(urlParameter.getValue(),Binding.HTTPRedirect));  //decode and show the saml message
-            } else {
-                requestHeader.append(urlParameter.getValue());  //show the raw parameter
+                requestTextArea.setText(extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect));
+                samlBinding = Binding.HTTPRedirect;
             }
-            requestHeader.append("\n");
+            requestPanel.revalidate();
+            getParams.put(urlParameter.getName(),urlParameter.getValue());
         }
-        StringBuilder requestParams = new StringBuilder();
+
         for (HtmlParameter formParameter : httpMessage.getFormParams()) {
-            requestParams.append(formParameter.getName()).append(" : ");
             if(formParameter.getName().equals("SAMLRequest")||formParameter.getName().equals("SAMLResponse")){
-                requestParams.append(extractSAMLMessage(formParameter.getValue(),Binding.HTTPPost));  //decode and show the saml
-                // message
-            } else {
-                requestParams.append(formParameter.getValue());  //show the raw parameter
+                requestTextArea.setText(extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost));  //decode and show
+                // the saml message
+                samlBinding = Binding.HTTPPost;
             }
-            requestParams.append("\n");
+            postParams.put(formParameter.getName(),formParameter.getValue());
         }
-        requestHeaderTextArea.setText(requestHeader.toString());
-        requestBodyTextArea.setText(requestParams.toString());
     }
 
     /**
@@ -111,7 +110,8 @@ public class SAMLRequestEditor{
                     val = URLDecoder.decode(val,"UTF-8");
                 case HTTPRedirect:
                     byte[] b64decoded = SAMLUtils.b64Decode(val);
-                    return SAMLUtils.inflateMessage(b64decoded);
+                    String rawMessage = SAMLUtils.inflateMessage(b64decoded);
+                    return SAMLUtils.prettyFormatXML(rawMessage);
                 default:
                     break;
             }
