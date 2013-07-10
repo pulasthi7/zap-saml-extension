@@ -22,12 +22,17 @@ public class SAMLRequestEditor{
     private JTextArea responseBodyTextArea;
     private JPanel requestPanel;
     private JPanel responsePanel;
+    private JPanel footerPanel;
+    private JPanel attribPanel;
     private JSplitPane responseSplitPane;
-    private JTextArea requestTextArea;
-    private JScrollPane requestScrollPane;
-    private JPanel headerPanel;
-    private JButton sendButton;
-    private JButton editOtherParamButton;
+    private JTextArea samlMsgTxtArea;
+    private JScrollPane reqAttribScrollPane;
+    private JScrollPane samlMsgScrollPane;
+
+    private JLabel lblWarningMsg;
+    private JButton resendButton;
+    private JButton resetButton;
+
 
     private Map<String,String> getParams;
     private Map<String,String> postParams;
@@ -46,13 +51,19 @@ public class SAMLRequestEditor{
     protected void init(){
         samlEditorPanel = new JPanel();
         tabbedPane1RequestResponse = new JTabbedPane();
-        requestTextArea = new JTextArea();
         responseBodyTextArea = new JTextArea();
         responseHeaderTextArea = new JTextArea();
         requestPanel = new JPanel();
         responsePanel = new JPanel();
+        footerPanel = new JPanel();
+        attribPanel = new JPanel();
         responseSplitPane = new JSplitPane();
-        requestScrollPane = new JScrollPane(requestTextArea);
+        samlMsgTxtArea = new JTextArea();
+        reqAttribScrollPane = new JScrollPane();
+        samlMsgScrollPane = new JScrollPane();
+        resendButton = new JButton();
+        resetButton = new JButton();
+        lblWarningMsg = new JLabel();
 
         samlEditorPanel.setLayout(new BorderLayout());
         samlEditorPanel.add(tabbedPane1RequestResponse);
@@ -60,16 +71,20 @@ public class SAMLRequestEditor{
         tabbedPane1RequestResponse.add("Response",responsePanel);
 
         requestPanel.setLayout(new BorderLayout());
+        samlMsgScrollPane.setViewportView(samlMsgTxtArea);
+        requestPanel.add(samlMsgScrollPane, BorderLayout.PAGE_START);
+
+        attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
+        initSAMLArributes();
+        reqAttribScrollPane.setViewportView(attribPanel);
+
+        requestPanel.add(reqAttribScrollPane,BorderLayout.CENTER);
+
+        initFooter();
+
+        requestPanel.add(footerPanel,BorderLayout.PAGE_END);
+
         responsePanel.setLayout(new BorderLayout());
-
-        headerPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        sendButton = new JButton("Resend");
-        editOtherParamButton = new JButton("Edit other parameters");
-        headerPanel.add(sendButton);
-        headerPanel.add(editOtherParamButton);
-        requestPanel.add(headerPanel,BorderLayout.PAGE_START);
-        requestPanel.add(requestScrollPane,BorderLayout.CENTER);
-
         responsePanel.add(responseSplitPane);
 
         responseSplitPane.setTopComponent(responseHeaderTextArea);
@@ -83,10 +98,10 @@ public class SAMLRequestEditor{
     }
 
     private void initButton(){
-        sendButton.addActionListener(new ActionListener() {
+        resendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String samlMessage =  requestTextArea.getText();
+                String samlMessage = samlMsgTxtArea.getText();
                 try {
                     HttpMessage message = SAMLResender.buildSAMLRequest(httpMessage, getParams, postParams,
                             samlParameter, samlMessage, samlBinding);
@@ -97,6 +112,56 @@ public class SAMLRequestEditor{
                 }
             }
         });
+    }
+
+    private void initSAMLArributes(){
+        Map<String, String> samlAttributes = getSAMLAttributes();
+        for (Map.Entry<String, String> entry : samlAttributes.entrySet()) {
+            JSplitPane sPane = new JSplitPane();
+            JLabel lbl = new JLabel();
+            JTextField txtValue = new JTextField();
+
+            sPane.setDividerLocation(100);
+            sPane.setDividerSize(0);
+
+            lbl.setText(entry.getKey());
+            sPane.setLeftComponent(lbl);
+
+            txtValue.setText(entry.getValue());
+            sPane.setRightComponent(txtValue);
+            attribPanel.add(sPane);
+        }
+    }
+
+    private void initFooter(){
+        footerPanel.setLayout(new java.awt.GridLayout(2, 1));
+        lblWarningMsg.setText("Warning"); //TODO change the warning
+        JSplitPane buttonSplitPane = new JSplitPane();
+        buttonSplitPane.setDividerSize(0);
+        buttonSplitPane.setLeftComponent(resendButton);
+        buttonSplitPane.setRightComponent(resetButton);
+        resendButton.setText("Resend");
+        resetButton.setText("Reset");
+        footerPanel.add(buttonSplitPane);
+        footerPanel.add(lblWarningMsg);
+    }
+
+    private Map<String,String> getSAMLAttributes(){
+        //TODO sample implementation, need to be changed
+        Map<String,String> attribMap = new HashMap<>();
+        attribMap.put("issuer","SSOSampleApp");
+        attribMap.put("Attribute 2","Value 2");
+        attribMap.put("Attribute 3","Value 3");
+        attribMap.put("Attribute 4","Value 4");
+        attribMap.put("Attribute 5","Value 5");
+        attribMap.put("Attribute 6","Value 6");
+        attribMap.put("Attribute 7","Value 7");
+        attribMap.put("Attribute 8","Value 8");
+        attribMap.put("Attribute 9","Value 9");
+        attribMap.put("Attribute 10","Value 10");
+        attribMap.put("Attribute 11","Value 11");
+        attribMap.put("Attribute 12","Value 12");
+        return attribMap;
     }
 
     private void updateResponse(HttpMessage msg){
@@ -111,7 +176,7 @@ public class SAMLRequestEditor{
     public void setMessage(HttpMessage httpMessage){
         for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
             if(urlParameter.getName().equals("SAMLRequest")||urlParameter.getName().equals("SAMLResponse")){
-                requestTextArea.setText(extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect));
+                samlMsgTxtArea.setText(extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect));
                 samlBinding = Binding.HTTPRedirect;
                 samlParameter = urlParameter.getName();
             } else {
@@ -121,7 +186,7 @@ public class SAMLRequestEditor{
 
         for (HtmlParameter formParameter : httpMessage.getFormParams()) {
             if(formParameter.getName().equals("SAMLRequest")||formParameter.getName().equals("SAMLResponse")){
-                requestTextArea.setText(extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost));  //decode and show
+                samlMsgTxtArea.setText(extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost));  //decode and show
                 // the saml message
                 samlBinding = Binding.HTTPPost;
                 samlParameter = formParameter.getName();
