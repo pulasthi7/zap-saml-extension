@@ -114,6 +114,9 @@ public class SAMLRequestEditor{
         });
     }
 
+    /**
+     * Initialize the SAML attribute/value pairs
+     */
     private void initSAMLArributes(){
         Map<String, String> samlAttributes = getSAMLAttributes();
         for (Map.Entry<String, String> entry : samlAttributes.entrySet()) {
@@ -133,6 +136,9 @@ public class SAMLRequestEditor{
         }
     }
 
+    /**
+     * Initialize the footer content of the UI
+     */
     private void initFooter(){
         footerPanel.setLayout(new java.awt.GridLayout(2, 1));
         lblWarningMsg.setText("Warning"); //TODO change the warning
@@ -146,6 +152,10 @@ public class SAMLRequestEditor{
         footerPanel.add(lblWarningMsg);
     }
 
+    /**
+     * Parses the saml request and get the attribute/value pairs to show
+     * @return
+     */
     private Map<String,String> getSAMLAttributes(){
         //TODO sample implementation, need to be changed
         Map<String,String> attribMap = new HashMap<>();
