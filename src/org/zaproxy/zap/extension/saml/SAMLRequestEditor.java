@@ -103,10 +103,10 @@ public class SAMLRequestEditor{
             public void actionPerformed(ActionEvent e) {
                 String samlMessage = samlMsgTxtArea.getText();
                 try {
-                    HttpMessage message = SAMLResender.buildSAMLRequest(httpMessage, getParams, postParams,
+                    SAMLResender.buildSAMLRequest(httpMessage, getParams, postParams,
                             samlParameter, samlMessage, samlBinding);
-                    SAMLResender.resendMessage(message);
-                    updateResponse(message);
+                    SAMLResender.resendMessage(httpMessage);
+                    updateResponse(httpMessage);
                 } catch (SAMLException e1) {
                     e1.printStackTrace();
                 }

@@ -14,8 +14,18 @@ public class SAMLResender {
     private SAMLResender(){
         
     }
-    
-    public static HttpMessage buildSAMLRequest(HttpMessage msg, Map<String,String> getParams,Map<String,
+
+    /**
+     * Rebuild the http request with the given url or form parameters
+     * @param msg HTTPMessage that contains the request
+     * @param getParams The GET parameters to add
+     * @param postParams The POST parameters to add
+     * @param samlParam The name of the SAML parameter (i.e. 'SAMLRequest' or 'SAMLResponse')
+     * @param samlMessage The SAML message
+     * @param samlMsgBinding The binding to be used to send SAML Message
+     * @throws SAMLException
+     */
+    public static void buildSAMLRequest(HttpMessage msg, Map<String,String> getParams,Map<String,
             String> postParams, String samlParam,String samlMessage, Binding samlMsgBinding) throws SAMLException {
         TreeSet<HtmlParameter> getParameters = new TreeSet<>();
         for (Map.Entry<String, String> getParam : getParams.entrySet()) {
@@ -42,9 +52,12 @@ public class SAMLResender {
         }
         msg.setGetParams(getParameters);
         msg.setFormParams(postParameters);
-        return msg;
     }
 
+    /**
+     * Resend the message to the desired endpoint and get the response
+     * @param msg The message to be sent
+     */
     public static void resendMessage(HttpMessage msg){
         HttpSender sender = new HttpSender(Model.getSingleton().getOptionsParam().getConnectionParam(),true,
                 HttpSender.MANUAL_REQUEST_INITIATOR);
