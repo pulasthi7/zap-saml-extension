@@ -1,6 +1,8 @@
 package org.zaproxy.zap.extension.saml;
 
 import org.opensaml.Configuration;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Response;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
@@ -15,14 +17,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 
 public class SAMLMessageWrapper {
     private String originalMessage;
     private Map<String,String> attributeMapping;
+    private String samlParameter;
 
-    public SAMLMessageWrapper(String originalMessage) {
+    public SAMLMessageWrapper(String originalMessage, String samlParameter) {
         this.originalMessage = originalMessage;
+        this.samlParameter = samlParameter;
     }
 
     public String getOriginalMessage() {
@@ -47,6 +52,15 @@ public class SAMLMessageWrapper {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
             XMLObject xmlObject = unmarshaller.unmarshall(element);
 
+            if("SAMLResponse".equals(samlParameter)){
+                Response response = (Response) xmlObject;
+                Assertion assertion = response.getAssertions().get(0);
+                attributeMapping.put("Assertion ID",assertion.getID());
+                attributeMapping.put("version",assertion.getVersion().toString());
+                attributeMapping.put("Issuer",assertion.getIssuer().getValue());
+                attributeMapping.put("Issuer format",assertion.getIssuer().getFormat());
+
+            }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
