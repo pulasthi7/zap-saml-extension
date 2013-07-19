@@ -43,7 +43,6 @@ public class SAMLRequestEditor{
     private HttpMessage httpMessage;
     private SAMLMessage samlMessage;                        //Representation of the saml message
     private String relayState;                          //Relay state parameter
-    private String samlParameterName;                   //Should be either "SAMLRequest" or "SAMLResponse"
     private Binding samlBinding;                        //Whether the http message has used http redirect or post
 
     public SAMLRequestEditor(HttpMessage message){
@@ -130,7 +129,7 @@ public class SAMLRequestEditor{
             JLabel lbl = new JLabel();
             JTextField txtValue = new JTextField();
 
-            sPane.setDividerLocation(100);
+            sPane.setDividerLocation(200);
             sPane.setDividerSize(0);
 
             lbl.setText(entry.getKey());
@@ -144,25 +143,10 @@ public class SAMLRequestEditor{
     }
 
     private void initButtons(){
-//        resendButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String samlMessage = samlMsgTxtArea.getText();
-//                try {
-//                    SAMLResender.buildSAMLRequest(httpMessage, getParams, postParams,
-//                            samlParameterName, samlMessage, samlBinding);
-//                    SAMLResender.resendMessage(httpMessage);
-//                    updateResponse(httpMessage);
-//                } catch (SAMLException e1) {
-//                    e1.printStackTrace();
-//                }
-//            }
-//        });
     }
 
     private void updateResponse(HttpMessage msg){
-        System.out.println(msg.getResponseBody().createCachedString("UTF-8"));
-
+//        System.out.println(msg.getResponseBody().createCachedString("UTF-8"));
     }
 
     private void setMessage(){
@@ -230,7 +214,6 @@ public class SAMLRequestEditor{
     }
 
     public static void main(String[] args) throws URIException, HttpMalformedHeaderException {
-
         HttpMessage msg= new HttpMessage(new HttpsURL("https://localhost:9443/samlsso?SAMLRequest=jZNPb%2BIwEMW%2FiuV7SPgnwCJUlKpapO42S9I99OaaoVhy7KxnQtlvv05CdjlUqFfP85t5v7GXd%2BfSsBN41M6mfDhIOAOr3F7b95S%2FFI%2FRnN%2BtlihLU4l1TUe7g981ILFwz6JoCymvvRVOokZhZQkoSIl8%2Ff1JjAaJqLwjp5zhbI0InkKjjbNYl%2BBz8Cet4GX3lPIjUSXi2DglzdEhiXkyT%2BI8f85lWRlYV1WM6Ix71zY4EXn9VhN0TmHYi9XW7uEccozGi9FkupgsOHt0XkE7esoP0iBwtn1IeQi6xUwi6hP8LyDWwQNJWkr5KBmOo2QWJeNiuBCjmZgkg%2Bls%2BspZdsl0r21H6haAt06E4ltRZFH2nBec%2FeqJBwHv%2Bbbd%2FdfJyp4nX11zWsbXdr35j3B9%2B5A5o9UftjbGfWw8SArZydfQYiol3W7YnOh9dGilomoyIIElzvKs8f9ZS6MPGnzKu%2BY87ttfng3s202EtRGciW1cWUmvsSEBZ6nowkJcqzYmBN3B4QrMl7nclCmhGutw3LyDD%2Bf3zV5BhSkLLy1WzlMH89N5Vj3oT7P9q17%2FmtVf&RelayState=null"));
         SAMLRequestEditor requestEditor = new SAMLRequestEditor(msg);
         requestEditor.showUI();
