@@ -98,27 +98,4 @@ public class SAMLUtils {
            throw new SAMLException("Message Deflation failed",e);
         }
     }
-
-    /**
-     * Convert a XML String to a pretty formatted String
-     * @param xmlString The unformatted XML String
-     * @return The Pretty formatted XML String
-     * @throws SAMLException If XML parsing failed
-     */
-    public static String prettyFormatXML(String xmlString) throws SAMLException {
-        try {
-            Source xmlInput = new StreamSource(new StringReader(xmlString));
-            StringWriter stringWriter = new StringWriter();
-            StreamResult xmlOutput = new StreamResult(stringWriter);
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            transformerFactory.setAttribute("indent-number", 4);
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.transform(xmlInput, xmlOutput);
-            return xmlOutput.getWriter().toString();
-        } catch (Exception e) {
-            throw new SAMLException("Formatting XML failed",e);
-        }
-    }
-
 }

@@ -16,54 +16,71 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SAMLRequestEditor{
-    private JPanel samlEditorPanel;
-    private JTabbedPane tabbedPane1RequestResponse;
-    private JTextArea responseHeaderTextArea;
-    private JTextArea responseBodyTextArea;
-    private JPanel requestPanel;
-    private JPanel responsePanel;
-    private JPanel footerPanel;
-    private JPanel attribPanel;
-    private JSplitPane responseSplitPane;
-    private JTextArea samlMsgTxtArea;
-    private JScrollPane reqAttribScrollPane;
-    private JScrollPane samlMsgScrollPane;
 
-    private JLabel lblWarningMsg;
-    private JButton resendButton;
-    private JButton resetButton;
+    //The UI components
+    private JPanel samlEditorPanel;                     //the root panel of the Jframe
 
+    private JTabbedPane tabbedPane1RequestResponse;     //Tabbed pane for request and response
+    private JPanel requestPanel;                        //The panel to display the components of request
+    private JPanel responsePanel;                       //The panel to display the components of the response
 
-    private Map<String,String> getParams;
-    private Map<String,String> postParams;
-    private Binding samlBinding;
+    private JSplitPane responseSplitPane;               //Split pane to divide response head and body
+    private JTextArea responseHeaderTextArea;           //Text area to display the http headers of the response
+    private JTextArea responseBodyTextArea;             //Text area to display the http response body
+
+    private JPanel attribPanel;                         //The panel to display the saml attribute name/value pairs
+    private JScrollPane reqAttribScrollPane;            //Scroll pane to give the scrollability to attrib panel
+
+    private JTextArea samlMsgTxtArea;                   //The text area to display the decoded saml message
+    private JScrollPane samlMsgScrollPane;              //Scroll pane to give the scrollability to saml msg text area
+    private JLabel lblWarningMsg;                       //Label to show the warning text
+
+    private JPanel footerPanel;                         //Panel to hold the items like buttons
+    private JButton resendButton;                       //Button to resend the request
+    private JButton resetButton;                        //Button to reset the request items
+
+    //Other variables
     private HttpMessage httpMessage;
-    private String samlParameter;
-    private SAMLMessageWrapper wrapper;
+    private SAMLMessage samlMessage;                        //Representation of the saml message
+    private String relayState;                          //Relay state parameter
+    private String samlParameterName;                   //Should be either "SAMLRequest" or "SAMLResponse"
+    private Binding samlBinding;                        //Whether the http message has used http redirect or post
 
-
-    public SAMLRequestEditor() throws HeadlessException {
+    public SAMLRequestEditor(HttpMessage message){
+        this.httpMessage = message;
+        setMessage();
     }
 
     /**
      * Initialize UI components and layouts
      */
-    protected void init(){
+    protected void initUIComponents(){
         samlEditorPanel = new JPanel();
+
         tabbedPane1RequestResponse = new JTabbedPane();
-        responseBodyTextArea = new JTextArea();
-        responseHeaderTextArea = new JTextArea();
         requestPanel = new JPanel();
         responsePanel = new JPanel();
-        footerPanel = new JPanel();
-        responseSplitPane = new JSplitPane();
-        samlMsgTxtArea = new JTextArea();
 
+        responseSplitPane = new JSplitPane();
+        responseBodyTextArea = new JTextArea();
+        responseHeaderTextArea = new JTextArea();
+
+        attribPanel = new JPanel();
+        reqAttribScrollPane = new JScrollPane();
+
+        samlMsgTxtArea = new JTextArea();
         samlMsgScrollPane = new JScrollPane();
-        resendButton = new JButton();
-        resetButton = new JButton();
         lblWarningMsg = new JLabel();
 
+        footerPanel = new JPanel();
+        resendButton = new JButton();
+        resetButton = new JButton();
+    }
+
+    /**
+     * Do the layout of the components in the frame
+     */
+    private void doLayout(){
         samlEditorPanel.setLayout(new BorderLayout());
         samlEditorPanel.add(tabbedPane1RequestResponse);
         tabbedPane1RequestResponse.add("Request",requestPanel);
@@ -73,49 +90,41 @@ public class SAMLRequestEditor{
         samlMsgScrollPane.setViewportView(samlMsgTxtArea);
         requestPanel.add(samlMsgScrollPane, BorderLayout.PAGE_START);
 
+        initSAMLAttributes();    //Initialize the layout of the saml attributes
         requestPanel.add(reqAttribScrollPane,BorderLayout.CENTER);
-        initFooter();
 
+        //Footer
+        footerPanel.setLayout(new java.awt.GridLayout(2, 1));
+        lblWarningMsg.setText("[Warning message]"); //TODO change the warning
+        JSplitPane buttonSplitPane = new JSplitPane();
+        buttonSplitPane.setDividerSize(0);
+        buttonSplitPane.setLeftComponent(resendButton);
+        buttonSplitPane.setRightComponent(resetButton);
+        resendButton.setText("Resend");
+        resetButton.setText("Reset");
+        footerPanel.add(buttonSplitPane);
+        footerPanel.add(lblWarningMsg);
         requestPanel.add(footerPanel,BorderLayout.PAGE_END);
 
+        //Response panel
         responsePanel.setLayout(new BorderLayout());
         responsePanel.add(responseSplitPane);
-
         responseSplitPane.setTopComponent(responseHeaderTextArea);
         responseSplitPane.setBottomComponent(responseBodyTextArea);
         responseSplitPane.setResizeWeight(0.5);
-
-
-        initButton();
-
     }
 
-    private void initButton(){
-        resendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String samlMessage = samlMsgTxtArea.getText();
-                try {
-                    SAMLResender.buildSAMLRequest(httpMessage, getParams, postParams,
-                            samlParameter, samlMessage, samlBinding);
-                    SAMLResender.resendMessage(httpMessage);
-                    updateResponse(httpMessage);
-                } catch (SAMLException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
-    }
+    private void initSAMLAttributes(){
 
-    /**
-     * Initialize the SAML attribute/value pairs
-     */
-    private void initSAMLArributes(){
-        attribPanel = new JPanel();
-        reqAttribScrollPane = new JScrollPane();
+        try {
+            samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
+        } catch (SAMLException e) {
+            e.printStackTrace();
+        }
 
         attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
-        Map<String, String> samlAttributes = getSAMLAttributes();
+        Map<String, String> samlAttributes = samlMessage.getAttributeMapping();
+
         for (Map.Entry<String, String> entry : samlAttributes.entrySet()) {
             JSplitPane sPane = new JSplitPane();
             JLabel lbl = new JLabel();
@@ -132,35 +141,23 @@ public class SAMLRequestEditor{
             attribPanel.add(sPane);
         }
         reqAttribScrollPane.setViewportView(attribPanel);
-
-
     }
 
-    /**
-     * Initialize the footer content of the UI
-     */
-    private void initFooter(){
-        footerPanel.setLayout(new java.awt.GridLayout(2, 1));
-        lblWarningMsg.setText("Warning"); //TODO change the warning
-        JSplitPane buttonSplitPane = new JSplitPane();
-        buttonSplitPane.setDividerSize(0);
-        buttonSplitPane.setLeftComponent(resendButton);
-        buttonSplitPane.setRightComponent(resetButton);
-        resendButton.setText("Resend");
-        resetButton.setText("Reset");
-        footerPanel.add(buttonSplitPane);
-        footerPanel.add(lblWarningMsg);
-    }
-
-    /**
-     * Parses the saml request and get the attribute/value pairs to show
-     * @return
-     */
-    private Map<String,String> getSAMLAttributes(){
-        if(wrapper!=null){
-            return wrapper.getAttributeMapping();
-        }
-        return new HashMap<>();
+    private void initButtons(){
+//        resendButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String samlMessage = samlMsgTxtArea.getText();
+//                try {
+//                    SAMLResender.buildSAMLRequest(httpMessage, getParams, postParams,
+//                            samlParameterName, samlMessage, samlBinding);
+//                    SAMLResender.resendMessage(httpMessage);
+//                    updateResponse(httpMessage);
+//                } catch (SAMLException e1) {
+//                    e1.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     private void updateResponse(HttpMessage msg){
@@ -168,39 +165,26 @@ public class SAMLRequestEditor{
 
     }
 
-    /**
-     * Set the request tab with the original request that was sent
-     * @param httpMessage The message that was exchanged
-     */
-    public void setMessage(HttpMessage httpMessage){
-        getParams = new HashMap<>();
-        postParams = new HashMap<>();
+    private void setMessage(){
         for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
             if(urlParameter.getName().equals("SAMLRequest")||urlParameter.getName().equals("SAMLResponse")){
-                String samlMessage = extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect);
-                samlMsgTxtArea.setText(samlMessage);
+                String msgString = extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect);
+                samlMessage = new SAMLMessage(msgString,urlParameter.getName());
                 samlBinding = Binding.HTTPRedirect;
-                samlParameter = urlParameter.getName();
-                wrapper = new SAMLMessageWrapper(samlMessage,samlParameter);
-            } else {
-                getParams.put(urlParameter.getName(),urlParameter.getValue());
+            } else if(urlParameter.getName().equals("RelayState")){
+                relayState = urlParameter.getValue();
             }
         }
 
         for (HtmlParameter formParameter : httpMessage.getFormParams()) {
             if(formParameter.getName().equals("SAMLRequest")||formParameter.getName().equals("SAMLResponse")){
-                String samlMessage = extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);
-//                samlMsgTxtArea.setText(samlMessage);  //decode and show
-                // the saml message
+                String msgString = extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);
+                samlMessage = new SAMLMessage(msgString,formParameter.getName());
                 samlBinding = Binding.HTTPPost;
-                samlParameter = formParameter.getName();
-                wrapper = new SAMLMessageWrapper(samlMessage,samlParameter);
-            }else {
-                postParams.put(formParameter.getName(),formParameter.getValue());
+            }else if(formParameter.getName().equals("RelayState")){
+                relayState = formParameter.getValue();
             }
         }
-        this.httpMessage = httpMessage;
-        initSAMLArributes();
     }
 
     /**
@@ -217,8 +201,7 @@ public class SAMLRequestEditor{
                     val = URLDecoder.decode(val,"UTF-8");
 
                     byte[] b64decoded = SAMLUtils.b64Decode(val);
-                    String rawMessage = SAMLUtils.inflateMessage(b64decoded);
-                    return SAMLUtils.prettyFormatXML(rawMessage);
+                    return SAMLUtils.inflateMessage(b64decoded);
                 default:
                     break;
             }
@@ -238,7 +221,8 @@ public class SAMLRequestEditor{
         JFrame frame = new JFrame("SAML Request editor");
         frame.setSize(640,480);
         frame.setLayout(new BorderLayout());
-        init();
+        initUIComponents();
+        doLayout();
         frame.setContentPane(samlEditorPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -246,9 +230,9 @@ public class SAMLRequestEditor{
     }
 
     public static void main(String[] args) throws URIException, HttpMalformedHeaderException {
-        SAMLRequestEditor requestEditor = new SAMLRequestEditor();
+
         HttpMessage msg= new HttpMessage(new HttpsURL("https://localhost:9443/samlsso?SAMLRequest=jZNPb%2BIwEMW%2FiuV7SPgnwCJUlKpapO42S9I99OaaoVhy7KxnQtlvv05CdjlUqFfP85t5v7GXd%2BfSsBN41M6mfDhIOAOr3F7b95S%2FFI%2FRnN%2BtlihLU4l1TUe7g981ILFwz6JoCymvvRVOokZhZQkoSIl8%2Ff1JjAaJqLwjp5zhbI0InkKjjbNYl%2BBz8Cet4GX3lPIjUSXi2DglzdEhiXkyT%2BI8f85lWRlYV1WM6Ix71zY4EXn9VhN0TmHYi9XW7uEccozGi9FkupgsOHt0XkE7esoP0iBwtn1IeQi6xUwi6hP8LyDWwQNJWkr5KBmOo2QWJeNiuBCjmZgkg%2Bls%2BspZdsl0r21H6haAt06E4ltRZFH2nBec%2FeqJBwHv%2Bbbd%2FdfJyp4nX11zWsbXdr35j3B9%2B5A5o9UftjbGfWw8SArZydfQYiol3W7YnOh9dGilomoyIIElzvKs8f9ZS6MPGnzKu%2BY87ttfng3s202EtRGciW1cWUmvsSEBZ6nowkJcqzYmBN3B4QrMl7nclCmhGutw3LyDD%2Bf3zV5BhSkLLy1WzlMH89N5Vj3oT7P9q17%2FmtVf&RelayState=null"));
-        requestEditor.setMessage(msg);
+        SAMLRequestEditor requestEditor = new SAMLRequestEditor(msg);
         requestEditor.showUI();
     }
 }

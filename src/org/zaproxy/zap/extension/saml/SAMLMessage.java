@@ -15,26 +15,51 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SAMLMessageWrapper {
+public class SAMLMessage {
     private String originalMessage;
     private Map<String,String> attributeMapping;
     private String samlParameter;
 
-    public SAMLMessageWrapper(String originalMessage, String samlParameter) {
+    public SAMLMessage(String originalMessage, String samlParameter) {
         this.originalMessage = originalMessage;
         this.samlParameter = samlParameter;
     }
 
     public String getOriginalMessage() {
         return originalMessage;
+    }
+
+    /**
+     * Convert the raw saml xml string to a pretty formatted String
+     * @return The Pretty formatted XML String
+     * @throws SAMLException If XML parsing failed
+     */
+    public String getPrettyFormattedMessage() throws SAMLException {
+        try {
+            Source xmlInput = new StreamSource(new StringReader(originalMessage));
+            StringWriter stringWriter = new StringWriter();
+            StreamResult xmlOutput = new StreamResult(stringWriter);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setAttribute("indent-number", 4);
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(xmlInput, xmlOutput);
+            return xmlOutput.getWriter().toString();
+        } catch (Exception e) {
+            throw new SAMLException("Formatting XML failed",e);
+        }
     }
 
     public Map<String, String> getAttributeMapping() {

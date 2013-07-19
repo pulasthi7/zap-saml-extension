@@ -19,9 +19,7 @@ public class SAMLResendMenuItem extends PopupMenuHttpMessage {
             View.getSingleton().showWarningDialog("Not a valid SAML request");
             return;
         }
-        SAMLRequestEditor editor = new SAMLRequestEditor();
-
-        editor.setMessage(httpMessage);
+        SAMLRequestEditor editor = new SAMLRequestEditor(httpMessage);
         editor.showUI();
     }
 
