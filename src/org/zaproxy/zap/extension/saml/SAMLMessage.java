@@ -1,8 +1,11 @@
 package org.zaproxy.zap.extension.saml;
 
+import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
+import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
+import org.opensaml.saml2.core.impl.IssuerImpl;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Unmarshaller;
@@ -85,7 +88,7 @@ public class SAMLMessage {
             if("SAMLResponse".equals(samlParameter)){
                 extractResponseAttributes(unmarshalledObject);
             } else if("SAMLRequest".equals(samlParameter)){
-                extractRequestAttributes(unmarshalledObject);
+                extractRequestAttributes();
             }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -102,24 +105,15 @@ public class SAMLMessage {
         }
     }
 
-    private void extractRequestAttributes(XMLObject xmlObject){
-        AuthnRequest request = (AuthnRequest) xmlObject;
-        attributeMapping.put("Request ID",request.getID());
-        attributeMapping.put("Assertion Consumer Service URL",request.getAssertionConsumerServiceURL());
-        attributeMapping.put("Assertion Consumer Service Index", String.valueOf(request.getAssertionConsumerServiceIndex()));
-        attributeMapping.put("Assertion Issue Instant", request.getIssueInstant().toString());
-        attributeMapping.put("Assertion Protocol Binding", request.getProtocolBinding());
-        attributeMapping.put("Assertion Version", request.getVersion().toString());
-
-        attributeMapping.put("Issuer", request.getIssuer().getValue());
-        attributeMapping.put("NameIDPolicy Format", request.getNameIDPolicy().getFormat());
-        attributeMapping.put("NameIDPolicy SPNameQualifier",request.getNameIDPolicy().getSPNameQualifier());
-        attributeMapping.put("NameIDPolicy AllowCreate",request.getNameIDPolicy().getAllowCreate().toString());
-
-        if(request.getRequestedAuthnContext().getAuthnContextClassRefs().size()>0){
-            attributeMapping.put("AuthContextClassRef",request.getRequestedAuthnContext().getAuthnContextClassRefs()
-                    .get(0).getAuthnContextClassRef());
+    private void extractRequestAttributes(){
+        attributeMapping = new LinkedHashMap<>();
+        for (String attribute : getSelectedAttributes()) {
+            String value = getValueOf(attribute);
+            if(value!=null && !"".equals(value)){
+                attributeMapping.put(attribute,value);
+            }
         }
+
     }
 
     private void extractResponseAttributes(XMLObject xmlObject){
@@ -186,6 +180,16 @@ public class SAMLMessage {
         return "";
     }
 
+    private boolean setValueTo(String key, String value){
+        if (unmarshalledObject==null){
+            return false;
+        }
+        if(key.startsWith("AuthnRequest")){
+            return setAuthnRequestValue(key,value);
+        }
+        return false;
+    }
+
     private String getAuthnRequestValue(String key){
         if(!(unmarshalledObject instanceof AuthnRequest)){
             return "";
@@ -210,5 +214,57 @@ public class SAMLMessage {
         return "";
     }
 
+    private boolean setAuthnRequestValue(String key, String value){
+        if(!(unmarshalledObject instanceof AuthnRequest)){
+            return false;
+        }
+        AuthnRequest authnRequest = (AuthnRequest) unmarshalledObject;
+        switch (key){
+            case "AuthnRequest[ID]":
+                authnRequest.setID(value);
+                return true;
+            case "AuthnRequest[AssertionConsumerServiceURL]" :
+                authnRequest.setAssertionConsumerServiceURL(value);
+                return true;
+            case "AuthnRequest[AttributeConsumingServiceIndex]" :
+                authnRequest.setAttributeConsumingServiceIndex(Integer.parseInt(value));
+                return true;
+            case "AuthnRequest[IssueInstant]" :
+                authnRequest.setIssueInstant(DateTime.parse(value));
+                return true;
+            case "AuthnRequest[ProtocolBinding]" :
+                authnRequest.setProtocolBinding(value);
+                return true;
+            case "AuthnRequest[Version]" :
+                authnRequest.setVersion(SAMLVersion.valueOf(value));
+                return true;
+            case "AuthnRequest:Issuer" :
+                authnRequest.getIssuer().setValue(value);
+                return true;
+            case "AuthnRequest:NameIDPolicy[Format]" :
+                authnRequest.getNameIDPolicy().setFormat(value);
+                return true;
+            case "AuthnRequest:NameIDPolicy[SPNameQualifier]" :
+                authnRequest.getNameIDPolicy().setSPNameQualifier(value);
+                return true;
+            case "AuthnRequest:NameIDPolicy[AllowCreate]" :
+                authnRequest.getNameIDPolicy().setAllowCreate(Boolean.valueOf(value));
+                return true;
+            case "AuthnRequest:RequestedAuthnContext[Comparison]" :
+                AuthnContextComparisonTypeEnumeration type = authnRequest.getRequestedAuthnContext().getComparison();
+                switch (value){
+                    case "EXACT": type = AuthnContextComparisonTypeEnumeration.EXACT; break;
+                    case "BETTER": type = AuthnContextComparisonTypeEnumeration.BETTER; break;
+                    case "MAXIMUM": type = AuthnContextComparisonTypeEnumeration.MAXIMUM; break;
+                    case "MINIMUM": type = AuthnContextComparisonTypeEnumeration.MINIMUM; break;
+                }
+                authnRequest.getRequestedAuthnContext().setComparison(type);
+                return true;
+            case "AuthnRequest:RequestedAuthnContext:AuthnContextClassRef" :
+                authnRequest.getRequestedAuthnContext().getAuthnContextClassRefs().get(0).setAuthnContextClassRef(value);
+                return true;
+        }
+        return false;
+    }
 
 }
