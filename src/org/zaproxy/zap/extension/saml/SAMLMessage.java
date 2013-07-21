@@ -22,15 +22,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SAMLMessage {
     private String originalMessage;
     private Map<String,String> attributeMapping;
     private String samlParameter;
+    private XMLObject unmarshalledObject;
 
     public SAMLMessage(String originalMessage, String samlParameter) {
         this.originalMessage = originalMessage;
@@ -82,12 +80,12 @@ public class SAMLMessage {
             Element element = document.getDocumentElement();
             UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
-            XMLObject xmlObject = unmarshaller.unmarshall(element);
+            unmarshalledObject = unmarshaller.unmarshall(element);
             attributeMapping = new LinkedHashMap<>();
             if("SAMLResponse".equals(samlParameter)){
-                extractResponseAttributes(xmlObject);
+                extractResponseAttributes(unmarshalledObject);
             } else if("SAMLRequest".equals(samlParameter)){
-                extractRequestAttributes(xmlObject);
+                extractRequestAttributes(unmarshalledObject);
             }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -156,10 +154,61 @@ public class SAMLMessage {
         for (AuthnStatement authnStatement : assertion.getAuthnStatements()) {
             attributeMapping.put("AuthStatement : Session Index",authnStatement.getSessionIndex());
             attributeMapping.put("AuthStatement : Auth Instant",authnStatement.getAuthnInstant().toString());
-            attributeMapping.put("AuthStatement : AuthContextClassRef",authnStatement.getAuthnContext()
-                    .getAuthnContextClassRef()
-                    .getAuthnContextClassRef());
 
         }
     }
+
+    private Set<String> getSelectedAttributes(){
+        Set<String> result = new HashSet<>();
+        result.add("AuthnRequest[ID]");
+        result.add("AuthnRequest[AssertionConsumerServiceURL]");
+        result.add("AuthnRequest[AttributeConsumingServiceIndex]");
+        result.add("AuthnRequest[IssueInstant]");
+        result.add("AuthnRequest[ProtocolBinding]");
+        result.add("AuthnRequest[Version]");
+        result.add("AuthnRequest:Issuer");
+        result.add("AuthnRequest:NameIDPolicy[Format]");
+        result.add("AuthnRequest:NameIDPolicy[SPNameQualifier]");
+        result.add("AuthnRequest:NameIDPolicy[AllowCreate]");
+        result.add("AuthnRequest:RequestedAuthnContext[Comparison]");
+        result.add("AuthnRequest:RequestedAuthnContext:AuthnContextClassRef");
+
+        return result;
+    }
+
+    private String getValueOf(String key){
+        if (unmarshalledObject==null){
+            return "";
+        }
+        if(key.startsWith("AuthnRequest")){
+            return getAuthnRequestValue(key);
+        }
+        return "";
+    }
+
+    private String getAuthnRequestValue(String key){
+        if(!(unmarshalledObject instanceof AuthnRequest)){
+            return "";
+        }
+        AuthnRequest authnRequest = (AuthnRequest) unmarshalledObject;
+        switch (key){
+            case "AuthnRequest[ID]": return  authnRequest.getID();
+            case "AuthnRequest[AssertionConsumerServiceURL]" : return authnRequest.getAssertionConsumerServiceURL();
+            case "AuthnRequest[AttributeConsumingServiceIndex]" : return String.valueOf(authnRequest.getAttributeConsumingServiceIndex());
+            case "AuthnRequest[IssueInstant]" : return authnRequest.getIssueInstant().toString();
+            case "AuthnRequest[ProtocolBinding]" : return authnRequest.getProtocolBinding();
+            case "AuthnRequest[Version]" : return authnRequest.getVersion().toString();
+            case "AuthnRequest:Issuer" : return authnRequest.getIssuer().getValue();
+            case "AuthnRequest:NameIDPolicy[Format]" : return authnRequest.getNameIDPolicy().getFormat();
+            case "AuthnRequest:NameIDPolicy[SPNameQualifier]" : return authnRequest.getNameIDPolicy().getSPNameQualifier();
+            case "AuthnRequest:NameIDPolicy[AllowCreate]" : return authnRequest.getNameIDPolicy().getAllowCreate().toString();
+            case "AuthnRequest:RequestedAuthnContext[Comparison]" : return authnRequest.getRequestedAuthnContext()
+                    .getComparison().toString();
+            case "AuthnRequest:RequestedAuthnContext:AuthnContextClassRef" : return authnRequest.getRequestedAuthnContext()
+                    .getAuthnContextClassRefs().get(0).getAuthnContextClassRef();
+        }
+        return "";
+    }
+
+
 }
