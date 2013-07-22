@@ -5,12 +5,9 @@ import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.IssuerImpl;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.io.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -22,10 +19,14 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class SAMLMessage {
     private String originalMessage;
@@ -34,8 +35,13 @@ public class SAMLMessage {
     private XMLObject unmarshalledObject;
 
     public SAMLMessage(String originalMessage, String samlParameter) {
-        this.originalMessage = originalMessage;
-        this.samlParameter = samlParameter;
+        try {
+            DefaultBootstrap.bootstrap();
+            this.originalMessage = originalMessage;
+            this.samlParameter = samlParameter;
+        } catch (ConfigurationException e) {
+
+        }
     }
 
     public String getOriginalMessage() {
@@ -49,12 +55,22 @@ public class SAMLMessage {
      */
     public String getPrettyFormattedMessage() throws SAMLException {
         try {
-            Source xmlInput = new StreamSource(new StringReader(originalMessage));
+            Source xmlInput;
+            if(unmarshalledObject!=null){
+                MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+                Marshaller marshaller = marshallerFactory.getMarshaller(unmarshalledObject);
+                Element element = marshaller.marshall(unmarshalledObject);
+                xmlInput = new DOMSource(element);
+            } else {
+                xmlInput = new StreamSource(new StringReader(originalMessage));
+            }
+
             StringWriter stringWriter = new StringWriter();
             StreamResult xmlOutput = new StreamResult(stringWriter);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setAttribute("indent-number", 4);
             Transformer transformer = transformerFactory.newTransformer();
+
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
@@ -72,7 +88,6 @@ public class SAMLMessage {
 
     private void extractAttributes(){
         try {
-            DefaultBootstrap.bootstrap();
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = null;
@@ -99,8 +114,6 @@ public class SAMLMessage {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ConfigurationException e) {
             e.printStackTrace();
         }
     }
@@ -180,7 +193,7 @@ public class SAMLMessage {
         return "";
     }
 
-    private boolean setValueTo(String key, String value){
+    public boolean setValueTo(String key, String value){
         if (unmarshalledObject==null){
             return false;
         }

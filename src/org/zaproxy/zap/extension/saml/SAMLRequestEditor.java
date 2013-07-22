@@ -10,9 +10,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SAMLRequestEditor{
@@ -124,12 +127,12 @@ public class SAMLRequestEditor{
         attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
         Map<String, String> samlAttributes = samlMessage.getAttributeMapping();
 
-        for (Map.Entry<String, String> entry : samlAttributes.entrySet()) {
+        for (final Map.Entry<String, String> entry : samlAttributes.entrySet()) {
             JSplitPane sPane = new JSplitPane();
             JLabel lbl = new JLabel();
-            JTextField txtValue = new JTextField();
+            final JTextField txtValue = new JTextField();
 
-            sPane.setDividerLocation(200);
+            sPane.setDividerLocation(300);
             sPane.setDividerSize(0);
 
             lbl.setText(entry.getKey());
@@ -137,6 +140,23 @@ public class SAMLRequestEditor{
 
             txtValue.setText(entry.getValue());
             sPane.setRightComponent(txtValue);
+
+            //update the saml message on attribute value changes
+            txtValue.addFocusListener(new FocusListener() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    try {
+                        samlMessage.setValueTo(entry.getKey(),txtValue.getText());
+                        samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
+                    } catch (SAMLException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
             attribPanel.add(sPane);
         }
         reqAttribScrollPane.setViewportView(attribPanel);
@@ -203,7 +223,7 @@ public class SAMLRequestEditor{
      */
     public void showUI(){
         JFrame frame = new JFrame("SAML Request editor");
-        frame.setSize(640,480);
+        frame.setSize(800,700);
         frame.setLayout(new BorderLayout());
         initUIComponents();
         doLayout();
