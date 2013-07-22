@@ -18,40 +18,30 @@ public class SAMLResender {
     /**
      * Rebuild the http request with the given url or form parameters
      * @param msg HTTPMessage that contains the request
-     * @param getParams The GET parameters to add
-     * @param postParams The POST parameters to add
      * @param samlParam The name of the SAML parameter (i.e. 'SAMLRequest' or 'SAMLResponse')
      * @param samlMessage The SAML message
      * @param samlMsgBinding The binding to be used to send SAML Message
      * @throws SAMLException
      */
-    public static void buildSAMLRequest(HttpMessage msg, Map<String,String> getParams,Map<String,
-            String> postParams, String samlParam,String samlMessage, Binding samlMsgBinding) throws SAMLException {
-        TreeSet<HtmlParameter> getParameters = new TreeSet<>();
-        for (Map.Entry<String, String> getParam : getParams.entrySet()) {
-            HtmlParameter parameter = new HtmlParameter(HtmlParameter.Type.url,getParam.getKey(),getParam.getValue());
-            getParameters.add(parameter);
-        }
-
-        TreeSet<HtmlParameter> postParameters = new TreeSet<>();
-        for (Map.Entry<String, String> postParam : getParams.entrySet()) {
-            HtmlParameter parameter = new HtmlParameter(HtmlParameter.Type.form,postParam.getKey(),postParam.getValue());
-            postParameters.add(parameter);
-        }
+    public static void buildSAMLRequest(HttpMessage msg, String samlParam,String samlMessage, Binding samlMsgBinding) throws SAMLException {
         String encodedSAMLMessage = SAMLUtils.b64Encode(SAMLUtils.deflateMessage(samlMessage));
         HtmlParameter parameter;
         switch (samlMsgBinding){
             case HTTPPost:
-                    parameter = new HtmlParameter(HtmlParameter.Type.form,samlParam,samlMessage);
-                    postParameters.add(parameter);
-                    break;
+                for (HtmlParameter param : msg.getFormParams()) {
+                    if(param.getName().equals(samlParam)){
+                        param.setValue(encodedSAMLMessage);
+                    }
+                }
+                break;
             case HTTPRedirect:
-                    parameter = new HtmlParameter(HtmlParameter.Type.url,samlParam,samlMessage);
-                    getParameters.add(parameter);
-                    break;
+                for (HtmlParameter param : msg.getUrlParams()) {
+                    if(param.getName().equals(samlParam)){
+                        param.setValue(encodedSAMLMessage);
+                    }
+                }
+                break;
         }
-        msg.setGetParams(getParameters);
-        msg.setFormParams(postParameters);
     }
 
     /**

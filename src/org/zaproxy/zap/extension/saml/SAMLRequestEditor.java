@@ -44,7 +44,8 @@ public class SAMLRequestEditor{
 
     //Other variables
     private HttpMessage httpMessage;
-    private SAMLMessage samlMessage;                        //Representation of the saml message
+    private SAMLMessage samlMessage;                    //Representation of the saml message
+    private String samlParameter;                       //"SAMLRequest" or "SAMLResponse"
     private String relayState;                          //Relay state parameter
     private Binding samlBinding;                        //Whether the http message has used http redirect or post
 
@@ -163,10 +164,22 @@ public class SAMLRequestEditor{
     }
 
     private void initButtons(){
+        resendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    SAMLResender.buildSAMLRequest(httpMessage,samlParameter,samlMessage.getPrettyFormattedMessage(),samlBinding);
+                    SAMLResender.resendMessage(httpMessage);
+                    updateResponse(httpMessage);
+                } catch (SAMLException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
     }
 
     private void updateResponse(HttpMessage msg){
-//        System.out.println(msg.getResponseBody().createCachedString("UTF-8"));
+        System.out.println(msg.getResponseBody().createCachedString("UTF-8"));
     }
 
     private void setMessage(){
@@ -175,6 +188,7 @@ public class SAMLRequestEditor{
                 String msgString = extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect);
                 samlMessage = new SAMLMessage(msgString,urlParameter.getName());
                 samlBinding = Binding.HTTPRedirect;
+                samlParameter = urlParameter.getName();
             } else if(urlParameter.getName().equals("RelayState")){
                 relayState = urlParameter.getValue();
             }
@@ -185,6 +199,7 @@ public class SAMLRequestEditor{
                 String msgString = extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);
                 samlMessage = new SAMLMessage(msgString,formParameter.getName());
                 samlBinding = Binding.HTTPPost;
+                samlParameter = formParameter.getName();
             }else if(formParameter.getName().equals("RelayState")){
                 relayState = formParameter.getValue();
             }
