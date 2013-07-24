@@ -6,7 +6,7 @@
 	<property name="build" location="build" />
 	<property name="dist" location="zap-exts" />
 	<property name="dist.lib.dir" location="../lib" />
-	<property name="status" value="release" />
+	<property name="status" value="alpha" />
 	<property name="versions.file" location="${dist}/ZapVersions-${status}.xml" />
 	<!-- This assumes you also have the zaproxy project -->
 	<property name="zap.plugin.dir" location="../../trunk/src/plugin" />
