@@ -216,9 +216,8 @@ public class SAMLRequestEditor{
         try {
             switch (binding) {
                 case HTTPPost:
-                case HTTPRedirect:
                     val = URLDecoder.decode(val,"UTF-8");
-
+                case HTTPRedirect:
                     byte[] b64decoded = SAMLUtils.b64Decode(val);
                     return SAMLUtils.inflateMessage(b64decoded);
                 default:
@@ -242,6 +241,7 @@ public class SAMLRequestEditor{
         frame.setLayout(new BorderLayout());
         initUIComponents();
         doLayout();
+        initButtons();
         frame.setContentPane(samlEditorPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
