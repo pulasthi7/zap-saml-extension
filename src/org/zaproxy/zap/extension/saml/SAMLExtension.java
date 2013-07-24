@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SAMLExtension extends ExtensionAdaptor implements SessionChangedListener {
+public class SAMLExtension extends ExtensionAdaptor {
 
     @Override
     public URL getURL() {
@@ -45,21 +45,5 @@ public class SAMLExtension extends ExtensionAdaptor implements SessionChangedLis
             extensionHook.getHookMenu().addPopupMenuItem(samlMenu);
         }
 
-    }
-
-    @Override
-    public void sessionChanged(Session session) {
-    }
-
-    @Override
-    public void sessionAboutToChange(Session session) {
-    }
-
-    @Override
-    public void sessionScopeChanged(Session session) {
-    }
-
-    @Override
-    public void sessionModeChanged(Control.Mode mode) {
     }
 }
