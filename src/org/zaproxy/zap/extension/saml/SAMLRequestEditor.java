@@ -68,7 +68,6 @@ public class SAMLRequestEditor{
         responseBodyTextArea = new JTextArea();
         responseHeaderTextArea = new JTextArea();
 
-        attribPanel = new JPanel();
         reqAttribScrollPane = new JScrollPane();
 
         samlMsgTxtArea = new JTextArea();
@@ -93,7 +92,7 @@ public class SAMLRequestEditor{
         samlMsgScrollPane.setViewportView(samlMsgTxtArea);
         requestPanel.add(samlMsgScrollPane, BorderLayout.PAGE_START);
 
-        initSAMLAttributes();    //Initialize the layout of the saml attributes
+        initSAMLContents();    //Initialize the layout of the saml attributes
         requestPanel.add(reqAttribScrollPane,BorderLayout.CENTER);
 
         //Footer
@@ -103,6 +102,7 @@ public class SAMLRequestEditor{
         buttonSplitPane.setDividerSize(0);
         buttonSplitPane.setLeftComponent(resendButton);
         buttonSplitPane.setRightComponent(resetButton);
+        buttonSplitPane.setResizeWeight(0.5);
         resendButton.setText("Resend");
         resetButton.setText("Reset");
         footerPanel.add(buttonSplitPane);
@@ -117,14 +117,41 @@ public class SAMLRequestEditor{
         responseSplitPane.setResizeWeight(0.5);
     }
 
-    private void initSAMLAttributes(){
+    /**
+     * Initialize the SAML contents. i.e. message and the attributes
+     */
+    private void initSAMLContents(){
+        initSAMLTextArea();
+        initSAMLAttributes();
+    }
 
+    /**
+     * Initialize the saml message text area
+     */
+    private void initSAMLTextArea(){
         try {
             samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
+            samlMsgTxtArea.addFocusListener(new FocusListener() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    samlMessage = new SAMLMessage(samlMsgTxtArea.getText(),samlMessage.getSamlParameter());
+                    initSAMLAttributes();
+                }
+            });
         } catch (SAMLException e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * Initialize the SAML attributes (label, value pairs)
+     */
+    private void initSAMLAttributes(){
+        attribPanel = new JPanel();
         attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
         Map<String, String> samlAttributes = samlMessage.getAttributeMapping();
 
@@ -176,10 +203,19 @@ public class SAMLRequestEditor{
                 }
             }
         });
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                samlMessage.resetMessage();
+                initSAMLContents();
+            }
+        });
     }
 
     private void updateResponse(HttpMessage msg){
-        System.out.println(msg.getResponseBody().createCachedString("UTF-8"));
+        responseBodyTextArea.setText(msg.getResponseBody().createCachedString("UTF-8"));
+        responseHeaderTextArea.setText(msg.getResponseHeader().toString());
+        tabbedPane1RequestResponse.setSelectedIndex(1);
     }
 
     private void setMessage(){

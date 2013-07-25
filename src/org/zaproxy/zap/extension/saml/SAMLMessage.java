@@ -44,8 +44,15 @@ public class SAMLMessage {
         }
     }
 
-    public String getOriginalMessage() {
-        return originalMessage;
+    /**
+     * Reset the message (which might have changed from original one) back to original message
+     */
+    public void resetMessage() {
+        unmarshalledObject = null;
+    }
+
+    public String getSamlParameter() {
+        return samlParameter;
     }
 
     /**
