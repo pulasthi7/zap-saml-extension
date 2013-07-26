@@ -14,8 +14,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SAMLRequestEditor{
@@ -28,6 +26,8 @@ public class SAMLRequestEditor{
     private JPanel responsePanel;                       //The panel to display the components of the response
 
     private JSplitPane responseSplitPane;               //Split pane to divide response head and body
+    private JScrollPane responseHeaderScrollPane;
+    private JScrollPane responseBodyScrollPane;
     private JTextArea responseHeaderTextArea;           //Text area to display the http headers of the response
     private JTextArea responseBodyTextArea;             //Text area to display the http response body
 
@@ -67,6 +67,8 @@ public class SAMLRequestEditor{
         responseSplitPane = new JSplitPane();
         responseBodyTextArea = new JTextArea();
         responseHeaderTextArea = new JTextArea();
+        responseHeaderScrollPane = new JScrollPane();
+        responseBodyScrollPane = new JScrollPane();
 
         reqAttribScrollPane = new JScrollPane();
 
@@ -97,7 +99,9 @@ public class SAMLRequestEditor{
 
         //Footer
         footerPanel.setLayout(new java.awt.GridLayout(2, 1));
-        lblWarningMsg.setText("[Warning message]"); //TODO change the warning
+        lblWarningMsg.setText("Note : This add-on would only run very basic test cases for SAML implementations. " +
+                "Signed SAML assertions cannot be tampered with at this time because the signing keys have not been " +
+                "made available to ZAP");
         JSplitPane buttonSplitPane = new JSplitPane();
         buttonSplitPane.setDividerSize(0);
         buttonSplitPane.setLeftComponent(resendButton);
@@ -112,9 +116,12 @@ public class SAMLRequestEditor{
         //Response panel
         responsePanel.setLayout(new BorderLayout());
         responsePanel.add(responseSplitPane);
-        responseSplitPane.setTopComponent(responseHeaderTextArea);
-        responseSplitPane.setBottomComponent(responseBodyTextArea);
+        responseHeaderScrollPane.setViewportView(responseHeaderTextArea);
+        responseBodyScrollPane.setViewportView(responseBodyTextArea);
+        responseSplitPane.setTopComponent(responseHeaderScrollPane);
+        responseSplitPane.setBottomComponent(responseBodyScrollPane);
         responseSplitPane.setResizeWeight(0.5);
+        responseSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
     }
 
     /**
@@ -193,13 +200,12 @@ public class SAMLRequestEditor{
     private void initButtons(){
         resendButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     SAMLResender.buildSAMLRequest(httpMessage,samlParameter,samlMessage.getPrettyFormattedMessage(),samlBinding);
                     SAMLResender.resendMessage(httpMessage);
                     updateResponse(httpMessage);
-                } catch (SAMLException e1) {
-                    e1.printStackTrace();
+                } catch (SAMLException e) {
                 }
             }
         });
@@ -216,6 +222,7 @@ public class SAMLRequestEditor{
         responseBodyTextArea.setText(msg.getResponseBody().createCachedString("UTF-8"));
         responseHeaderTextArea.setText(msg.getResponseHeader().toString());
         tabbedPane1RequestResponse.setSelectedIndex(1);
+
     }
 
     private void setMessage(){
