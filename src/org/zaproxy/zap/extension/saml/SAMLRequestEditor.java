@@ -188,7 +188,7 @@ public class SAMLRequestEditor{
                         samlMessage.setValueTo(entry.getKey(),txtValue.getText());
                         samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
                     } catch (SAMLException e1) {
-                        e1.printStackTrace();
+                        JOptionPane.showMessageDialog(reqAttribScrollPane,e1.getMessage(),"Error in value",JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });
