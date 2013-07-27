@@ -200,7 +200,7 @@ public class SAMLMessage {
         return "";
     }
 
-    public boolean setValueTo(String key, String value){
+    public boolean setValueTo(String key, String value) throws SAMLException {
         if (unmarshalledObject==null){
             return false;
         }
@@ -234,7 +234,7 @@ public class SAMLMessage {
         return "";
     }
 
-    private boolean setAuthnRequestValue(String key, String value){
+    private boolean setAuthnRequestValue(String key, String value) throws SAMLException {
         if(!(unmarshalledObject instanceof AuthnRequest)){
             return false;
         }
@@ -247,8 +247,13 @@ public class SAMLMessage {
                 authnRequest.setAssertionConsumerServiceURL(value);
                 return true;
             case "AuthnRequest[AttributeConsumingServiceIndex]" :
-                authnRequest.setAttributeConsumingServiceIndex(Integer.parseInt(value));
-                return true;
+                try{
+                    Integer intValue = Integer.parseInt(value);
+                    authnRequest.setAttributeConsumingServiceIndex(intValue);
+                    return true;
+                } catch (NumberFormatException e){
+                    throw new SAMLException("Given: "+value+" \nExpected: Integer");
+                }
             case "AuthnRequest[IssueInstant]" :
                 authnRequest.setIssueInstant(DateTime.parse(value));
                 return true;
@@ -277,6 +282,8 @@ public class SAMLMessage {
                     case "BETTER": type = AuthnContextComparisonTypeEnumeration.BETTER; break;
                     case "MAXIMUM": type = AuthnContextComparisonTypeEnumeration.MAXIMUM; break;
                     case "MINIMUM": type = AuthnContextComparisonTypeEnumeration.MINIMUM; break;
+                    default:throw new SAMLException("Incorrect value. \nGiven:"+value+" \nExpected:One of 'EXACT'," +
+                            "'BETTER','MAXIMUM','MINIMUM'");
                 }
                 authnRequest.getRequestedAuthnContext().setComparison(type);
                 return true;
