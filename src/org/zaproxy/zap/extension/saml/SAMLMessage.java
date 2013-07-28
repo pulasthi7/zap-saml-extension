@@ -119,63 +119,15 @@ public class SAMLMessage {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
             unmarshalledObject = unmarshaller.unmarshall(element);
             attributeMapping = new LinkedHashMap<>();
-            if ("SAMLResponse".equals(samlParameter)) {
-                extractResponseAttributes(unmarshalledObject);
-            } else if ("SAMLRequest".equals(samlParameter)) {
-                extractRequestAttributes();
+            attributeMapping = new LinkedHashMap<>();
+            for (String attribute : getSelectedAttributes()) {
+                String value = getValueOf(attribute);
+                if (value != null && !"".equals(value)) {
+                    attributeMapping.put(attribute, value);
+                }
             }
         } catch (Exception e) {
             throw new SAMLException("Error in extracting the attributes", e);
-        }
-    }
-
-    /**
-     * Extract the attributes of a SAML Request
-     */
-    private void extractRequestAttributes() {
-        attributeMapping = new LinkedHashMap<>();
-        for (String attribute : getSelectedAttributes()) {
-            String value = getValueOf(attribute);
-            if (value != null && !"".equals(value)) {
-                attributeMapping.put(attribute, value);
-            }
-        }
-
-    }
-
-    private void extractResponseAttributes(XMLObject xmlObject) {
-        Response response = (Response) xmlObject;
-        Assertion assertion = response.getAssertions().get(0);
-        attributeMapping.put("Assertion ID", assertion.getID());
-        attributeMapping.put("version", assertion.getVersion().toString());
-        attributeMapping.put("Issuer", assertion.getIssuer().getValue());
-        attributeMapping.put("Issuer format", assertion.getIssuer().getFormat());
-        attributeMapping.put("Subject : NameID", assertion.getSubject().getNameID().getValue());
-        if (assertion.getSubject().getSubjectConfirmations().size() > 0) {
-            SubjectConfirmation subjectConfirmation = assertion.getSubject().getSubjectConfirmations().get(0);
-            attributeMapping.put("Subject : Confirmation Method", subjectConfirmation.getMethod());
-            attributeMapping.put("Subject : Confirmation Address",
-                    subjectConfirmation.getSubjectConfirmationData().getAddress());
-            attributeMapping.put("Subject : InResponseTo", subjectConfirmation.getSubjectConfirmationData()
-                    .getInResponseTo());
-            attributeMapping.put("Subject : Recipient", subjectConfirmation.getSubjectConfirmationData()
-                    .getRecipient());
-            attributeMapping.put("Subject : NotAfter", subjectConfirmation.getSubjectConfirmationData()
-                    .getNotOnOrAfter().toString());
-        }
-
-        attributeMapping.put("Conditions : NotBefore", assertion.getConditions().getNotBefore().toString());
-        attributeMapping.put("Conditions : NotAfter", assertion.getConditions().getNotOnOrAfter().toString());
-
-        int restrictionNo = 0;
-        for (AudienceRestriction audienceRestriction : assertion.getConditions().getAudienceRestrictions()) {
-            attributeMapping.put("Audience " + restrictionNo, audienceRestriction.getAudiences().get(0).getAudienceURI());
-        }
-
-        for (AuthnStatement authnStatement : assertion.getAuthnStatements()) {
-            attributeMapping.put("AuthStatement : Session Index", authnStatement.getSessionIndex());
-            attributeMapping.put("AuthStatement : Auth Instant", authnStatement.getAuthnInstant().toString());
-
         }
     }
 
