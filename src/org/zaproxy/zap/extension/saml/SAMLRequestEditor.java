@@ -138,6 +138,7 @@ public class SAMLRequestEditor{
     private void initSAMLTextArea(){
         try {
             samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
+            samlMsgTxtArea.setRows(10);
             samlMsgTxtArea.addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -160,41 +161,45 @@ public class SAMLRequestEditor{
     private void initSAMLAttributes(){
         attribPanel = new JPanel();
         attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
-        Map<String, String> samlAttributes = samlMessage.getAttributeMapping();
+        Map<String, String> samlAttributes = null;
+        try {
+            samlAttributes = samlMessage.getAttributeMapping();
+            for (final Map.Entry<String, String> entry : samlAttributes.entrySet()) {
+                JSplitPane sPane = new JSplitPane();
+                JLabel lbl = new JLabel();
+                final JTextField txtValue = new JTextField();
 
-        for (final Map.Entry<String, String> entry : samlAttributes.entrySet()) {
-            JSplitPane sPane = new JSplitPane();
-            JLabel lbl = new JLabel();
-            final JTextField txtValue = new JTextField();
+                sPane.setDividerLocation(300);
+                sPane.setDividerSize(0);
 
-            sPane.setDividerLocation(300);
-            sPane.setDividerSize(0);
+                lbl.setText(entry.getKey());
+                sPane.setLeftComponent(lbl);
 
-            lbl.setText(entry.getKey());
-            sPane.setLeftComponent(lbl);
+                txtValue.setText(entry.getValue());
+                sPane.setRightComponent(txtValue);
 
-            txtValue.setText(entry.getValue());
-            sPane.setRightComponent(txtValue);
-
-            //update the saml message on attribute value changes
-            txtValue.addFocusListener(new FocusListener() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                }
-
-                @Override
-                public void focusLost(FocusEvent e) {
-                    try {
-                        samlMessage.setValueTo(entry.getKey(),txtValue.getText());
-                        samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
-                    } catch (SAMLException e1) {
-                        JOptionPane.showMessageDialog(reqAttribScrollPane,e1.getMessage(),"Error in value",JOptionPane.ERROR_MESSAGE);
+                //update the saml message on attribute value changes
+                txtValue.addFocusListener(new FocusListener() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
                     }
-                }
-            });
-            attribPanel.add(sPane);
+
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        try {
+                            samlMessage.setValueTo(entry.getKey(),txtValue.getText());
+                            samlMsgTxtArea.setText(samlMessage.getPrettyFormattedMessage());
+                        } catch (SAMLException e1) {
+                            JOptionPane.showMessageDialog(reqAttribScrollPane,e1.getMessage(),"Error in value",JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+                attribPanel.add(sPane);
+            }
+            reqAttribScrollPane.setViewportView(attribPanel);
+        } catch (SAMLException e) {
+            //TODO show error and exit
         }
-        reqAttribScrollPane.setViewportView(attribPanel);
     }
 
     private void initButtons(){
