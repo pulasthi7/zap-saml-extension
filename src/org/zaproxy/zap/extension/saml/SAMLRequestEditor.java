@@ -202,6 +202,9 @@ public class SAMLRequestEditor{
         }
     }
 
+    /**
+     * Initialize the action events for the buttons
+     */
     private void initButtons(){
         resendButton.addActionListener(new ActionListener() {
             @Override
@@ -223,6 +226,10 @@ public class SAMLRequestEditor{
         });
     }
 
+    /**
+     * Update the response using the response of the message
+     * @param msg The HttpMessage containing the response
+     */
     private void updateResponse(HttpMessage msg){
         responseBodyTextArea.setText(msg.getResponseBody().createCachedString("UTF-8"));
         responseHeaderTextArea.setText(msg.getResponseHeader().toString());
@@ -230,6 +237,9 @@ public class SAMLRequestEditor{
 
     }
 
+    /**
+     * Get the SAML message and other related information from the request and sets them to be used within the editor
+     */
     private void setMessage(){
         for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
             if(urlParameter.getName().equals("SAMLRequest")||urlParameter.getName().equals("SAMLResponse")){
