@@ -136,7 +136,12 @@ public class SAMLMessage {
         }
     }
 
+    /**
+     * Get the user preferred attributes to be shown in the attribute list
+     * @return Set o
+     */
     private Set<String> getSelectedAttributes() {
+        //Hardcoded to show all attributes (if available) for now. will be taken from a config file later
         Set<String> result = new HashSet<>();
         result.add("AuthnRequest[ID]");
         result.add("AuthnRequest[AssertionConsumerServiceURL]");
@@ -171,7 +176,12 @@ public class SAMLMessage {
         return result;
     }
 
-    private String getValueOf(String key) {
+    /**
+     * Get the value of a attribute as given by the key
+     * @param key The attribute name
+     * @return Value of the attribute as a string, empty string if attribute not set.
+     */
+    public String getValueOf(String key) {
         if (unmarshalledObject == null) {
             return "";
         }
@@ -183,6 +193,13 @@ public class SAMLMessage {
         return "";
     }
 
+    /**
+     * Set the value of a given attribute to the value specified
+     * @param key The attribute name to set the value
+     * @param value The value of the attribute to be set
+     * @return <code>true</code> if value is succesfully set,<code>false</code> otherwise
+     * @throws SAMLException if the given value type is not accepted by the key
+     */
     public boolean setValueTo(String key, String value) throws SAMLException {
         if (unmarshalledObject == null) {
             return false;
@@ -195,6 +212,11 @@ public class SAMLMessage {
         return false;
     }
 
+    /**
+     * Get the attribute value of a AUthRequest
+     * @param key the name of the attribute
+     * @return the value of the attribute
+     */
     private String getAuthnRequestValue(String key) {
         if (!(unmarshalledObject instanceof AuthnRequest)) {
             return "";
@@ -231,6 +253,13 @@ public class SAMLMessage {
         return "";
     }
 
+    /**
+     * Set the value of the given attribute in a AuthRequest
+     * @param key The attribute name
+     * @param value The attribute value
+     * @return <code>true</code> if the value is set, false if the key is not a valid one
+     * @throws SAMLException if value type is not accepted by key
+     */
     private boolean setAuthnRequestValue(String key, String value) throws SAMLException {
         if (!(unmarshalledObject instanceof AuthnRequest)) {
             return false;
@@ -311,6 +340,11 @@ public class SAMLMessage {
         return false;
     }
 
+    /**
+     * Get the attribute value of a Response
+     * @param key the name of the attribute
+     * @return the value of the attribute
+     */
     private String getResponseValue(String key) {
         if (!(unmarshalledObject instanceof Response)) {
             return "";
@@ -368,7 +402,14 @@ public class SAMLMessage {
         return "";
     }
 
-    private boolean setResponseValue(String key, String value){
+    /**
+     * Set the value of the given attribute in a Response
+     * @param key The attribute name
+     * @param value The attribute value
+     * @return <code>true</code> if the value is set, false if the key is not a valid one
+     * @throws SAMLException if value type is not accepted by key
+     */
+    private boolean setResponseValue(String key, String value) throws SAMLException {
         if (!(unmarshalledObject instanceof AuthnRequest)) {
             return false;
         }
@@ -428,7 +469,7 @@ public class SAMLMessage {
                     return true;
             }
         } catch (Exception e) {
-            return false;
+            throw new SAMLException("Can't set the value: '"+value+"' to the key: '"+key+"'");
         }
         return false;
     }
