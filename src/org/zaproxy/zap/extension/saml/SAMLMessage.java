@@ -4,17 +4,20 @@ import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.*;
+import org.opensaml.saml2.core.AuthnContextComparisonTypeEnumeration;
+import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml2.core.Response;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.*;
+import org.opensaml.xml.io.Marshaller;
+import org.opensaml.xml.io.MarshallerFactory;
+import org.opensaml.xml.io.Unmarshaller;
+import org.opensaml.xml.io.UnmarshallerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -22,7 +25,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -184,6 +189,8 @@ public class SAMLMessage {
         }
         if (key.startsWith("AuthnRequest")) {
             return setAuthnRequestValue(key, value);
+        } else if (key.startsWith("Assertion")){
+            return setResponseValue(key,value);
         }
         return false;
     }
@@ -359,6 +366,71 @@ public class SAMLMessage {
         }
 
         return "";
+    }
+
+    private boolean setResponseValue(String key, String value){
+        if (!(unmarshalledObject instanceof AuthnRequest)) {
+            return false;
+        }
+        Response response = (Response) unmarshalledObject;
+        try {
+            switch (key) {
+                case "Assertion[ID]":
+                    response.getAssertions().get(0).setID(value);
+                    return true;
+                case "Assertion[IssueInstant]":
+                    response.getAssertions().get(0).setIssueInstant(DateTime.parse(value));
+                    return true;
+                case "Assertion[Version]":
+                    response.getAssertions().get(0).setVersion(SAMLVersion.valueOf(value));
+                    return true;
+                case "Assertion:Issuer":
+                    response.getAssertions().get(0).getIssuer().setValue(value);
+                    return true;
+                case "Assertion:Issuer[Format]":
+                    response.getAssertions().get(0).getIssuer().setFormat(value);
+                    return true;
+                case "Assertion:Subject:NameID":
+                    response.getAssertions().get(0).getSubject().getNameID().setValue(value);
+                case "Assertion:Subject:SubjectConfirmation[Method]":
+                    response.getAssertions().get(0).getSubject().getSubjectConfirmations().get(0).setMethod(value);
+                    return true;
+                case "Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[InResponseTo]":
+                    response.getAssertions().get(0).getSubject().getSubjectConfirmations().get(0)
+                            .getSubjectConfirmationData().setInResponseTo(value);
+                    return true;
+                case "Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[Recipient]":
+                    response.getAssertions().get(0).getSubject().getSubjectConfirmations().get(0)
+                            .getSubjectConfirmationData().setRecipient(value);
+                    return true;
+                case "Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[NotOnOrAfter]":
+                    response.getAssertions().get(0).getSubject().getSubjectConfirmations().get(0)
+                            .getSubjectConfirmationData().setNotOnOrAfter(DateTime.parse(value));
+                    return true;
+                case "Assertion:Conditions[NotOnOrAfter]":
+                    response.getAssertions().get(0).getConditions().setNotOnOrAfter(DateTime.parse(value));
+                    return true;
+                case "Assertion:Conditions[NotBefore]":
+                    response.getAssertions().get(0).getConditions().setNotBefore(DateTime.parse(value));
+                case "Assertion:Conditions:AudienceRestriction:Audience":
+                    response.getAssertions().get(0).getConditions().getAudienceRestrictions().get(0).getAudiences()
+                            .get(0).setAudienceURI(value);
+                    return true;
+                case "Assertion:AuthnStatement[AuthnInstant]":
+                    response.getAssertions().get(0).getAuthnStatements().get(0).setAuthnInstant(DateTime.parse(value));
+                    return true;
+                case "Assertion:AuthnStatement[SessionIndex]":
+                    response.getAssertions().get(0).getAuthnStatements().get(0).setSessionIndex(value);
+                    return true;
+                case "Assertion:AuthnStatement:AuthnContext:AuthnContextClassRef":
+                    response.getAssertions().get(0).getAuthnStatements().get(0).getAuthnContext()
+                            .getAuthnContextClassRef().setAuthnContextClassRef(value);
+                    return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
 }
