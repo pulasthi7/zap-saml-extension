@@ -307,8 +307,8 @@ public class SAMLMessage {
                 }
 
             case "AuthnRequest:RequestedAuthnContext[Comparison]":
-                AuthnContextComparisonTypeEnumeration type = authnRequest.getRequestedAuthnContext().getComparison();
-                switch (value) {
+                AuthnContextComparisonTypeEnumeration type;
+                switch (value.toUpperCase()) {
                     case "EXACT":
                         type = AuthnContextComparisonTypeEnumeration.EXACT;
                         break;
