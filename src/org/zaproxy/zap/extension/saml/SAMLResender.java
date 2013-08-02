@@ -30,7 +30,6 @@ public class SAMLResender {
      */
     public static void buildSAMLRequest(HttpMessage msg, String samlParam,String samlMessage, Binding samlMsgBinding) throws SAMLException {
         String encodedSAMLMessage = SAMLUtils.b64Encode(SAMLUtils.deflateMessage(samlMessage));
-        HtmlParameter parameter;
         switch (samlMsgBinding){
             case HTTPPost:
                 for (HtmlParameter param : msg.getFormParams()) {
@@ -53,7 +52,7 @@ public class SAMLResender {
      * Resend the message to the desired endpoint and get the response
      * @param msg The message to be sent
      */
-    public static void resendMessage(final HttpMessage msg){
+    public static void resendMessage(final HttpMessage msg) throws SAMLException {
         HttpSender sender = new HttpSender(Model.getSingleton().getOptionsParam().getConnectionParam(),true,
                 HttpSender.MANUAL_REQUEST_INITIATOR);
         try {
@@ -77,12 +76,8 @@ public class SAMLResender {
                     }
                 }
             });
-        } catch (IOException e) {
-            //todo handle
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IOException|InterruptedException|InvocationTargetException e) {
+            throw new SAMLException("Message sending failed",e);
         }
     }
 }
