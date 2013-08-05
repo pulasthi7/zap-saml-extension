@@ -1,6 +1,10 @@
 package org.zaproxy.zap.extension.saml;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.parosproxy.paros.extension.encoder.Base64;
+import org.parosproxy.paros.model.Model;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -19,6 +23,7 @@ import java.util.zip.Inflater;
  */
 public class SAMLUtils {
     private static final int MAX_INFLATED_SIZE = 5000;
+    private static final String SAML_CONF_FILE_NAME = "saml.conf";
 
     /**
      * Private constructor, because this class is and Util class and the methods are static
@@ -96,6 +101,21 @@ public class SAMLUtils {
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
            throw new SAMLException("Message Deflation failed",e);
+        }
+    }
+
+    /**
+     * Get the configuration for the ZAP SAML extension
+     * @return
+     */
+    public static Configuration getConfigutation() throws SAMLException {
+        String confPath = Model.getSingleton().getOptionsParam().getUserDirectory().getAbsolutePath()
+                +"/"+SAML_CONF_FILE_NAME;
+        try {
+            XMLConfiguration config = new XMLConfiguration(confPath);
+            return config;
+        } catch (ConfigurationException e) {
+            throw new SAMLException("Error loading configuration",e);
         }
     }
 }
