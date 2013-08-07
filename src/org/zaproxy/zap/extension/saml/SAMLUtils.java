@@ -3,6 +3,8 @@ package org.zaproxy.zap.extension.saml;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 import org.parosproxy.paros.extension.encoder.Base64;
 import org.parosproxy.paros.model.Model;
 
@@ -13,6 +15,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -25,6 +30,7 @@ public class SAMLUtils {
     private static final int MAX_INFLATED_SIZE = 5000;
     private static final String SAML_CONF_FILE_NAME = "saml.conf";
 
+    protected static Logger log = Logger.getLogger(SAMLUtils.class);
     /**
      * Private constructor, because this class is and Util class and the methods are static
      */
@@ -108,14 +114,56 @@ public class SAMLUtils {
      * Get the configuration for the ZAP SAML extension
      * @return
      */
-    public static Configuration getConfigutation() throws SAMLException {
-        String confPath = Model.getSingleton().getOptionsParam().getUserDirectory().getAbsolutePath()
-                +"/"+SAML_CONF_FILE_NAME;
+    public static Configuration getConfigurations() {
+
+        XMLConfiguration config = null;
         try {
-            XMLConfiguration config = new XMLConfiguration(confPath);
-            return config;
+            config = new XMLConfiguration(getSamlConfFileName());
         } catch (ConfigurationException e) {
-            throw new SAMLException("Error loading configuration",e);
+            log.warn("Configuration was not available, Creating new Configuration");
         }
+        if(config == null){
+            config = new XMLConfiguration();
+        }
+        return config;
+    }
+
+    public static String getSamlConfFileName(){
+        return Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" + SAML_CONF_FILE_NAME;
+    }
+
+    public static List<String> getSAMLAttributes(){
+        List<String> allAttibutes = new ArrayList<>();
+        allAttibutes.add("AuthnRequest[ID]");
+        allAttibutes.add("AuthnRequest[AssertionConsumerServiceURL]");
+        allAttibutes.add("AuthnRequest[AttributeConsumingServiceIndex]");
+        allAttibutes.add("AuthnRequest[IssueInstant]");
+        allAttibutes.add("AuthnRequest[ProtocolBinding]");
+        allAttibutes.add("AuthnRequest[Version]");
+        allAttibutes.add("AuthnRequest:Issuer");
+        allAttibutes.add("AuthnRequest:NameIDPolicy[Format]");
+        allAttibutes.add("AuthnRequest:NameIDPolicy[SPNameQualifier]");
+        allAttibutes.add("AuthnRequest:NameIDPolicy[AllowCreate]");
+        allAttibutes.add("AuthnRequest:RequestedAuthnContext[Comparison]");
+        allAttibutes.add("AuthnRequest:RequestedAuthnContext:AuthnContextClassRef");
+
+        allAttibutes.add("Assertion[ID]");
+        allAttibutes.add("Assertion[IssueInstant]");
+        allAttibutes.add("Assertion[Version]");
+        allAttibutes.add("Assertion:Issuer");
+        allAttibutes.add("Assertion:Issuer[Format]");
+        allAttibutes.add("Assertion:Subject:NameID");
+        allAttibutes.add("Assertion:Subject:SubjectConfirmation[Method]");
+        allAttibutes.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[InResponseTo]");
+        allAttibutes.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[Recipient]");
+        allAttibutes.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[NotOnOrAfter]");
+        allAttibutes.add("Assertion:Conditions[NotOnOrAfter]");
+        allAttibutes.add("Assertion:Conditions[NotBefore]");
+        allAttibutes.add("Assertion:Conditions:AudienceRestriction:Audience");
+        allAttibutes.add("Assertion:AuthnStatement[AuthnInstant]");
+        allAttibutes.add("Assertion:AuthnStatement[SessionIndex]");
+        allAttibutes.add("Assertion:AuthnStatement:AuthnContext:AuthnContextClassRef");
+
+        return allAttibutes;
     }
 }

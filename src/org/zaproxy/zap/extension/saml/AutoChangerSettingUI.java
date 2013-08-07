@@ -1,28 +1,26 @@
 package org.zaproxy.zap.extension.saml;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.parosproxy.paros.view.View;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.BoxLayout;
-import javax.swing.JTextField;
 
-public class AutoChangerSettingUI extends JFrame {
+public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListner {
 
 	private JPanel contentPane;
     private JPanel attributePanel;
 
-    private XMLConfiguration configutation;
+    private XMLConfiguration configuration;
 
     private Map<String,String> valueMap;
 	/**
@@ -46,7 +44,7 @@ public class AutoChangerSettingUI extends JFrame {
 	 */
 	public AutoChangerSettingUI() {
 		setTitle("SAML Automatic Request Changer Settings");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(800, 700);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
@@ -69,25 +67,57 @@ public class AutoChangerSettingUI extends JFrame {
 		footerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		
 		JButton btnAdd = new JButton("Add more attributes");
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AddNewAttribute dialog = new AddNewAttribute();
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.setVisible(true);
+            }
+        });
 		footerPanel.add(btnAdd);
 		
 		JButton btnSaveChanges = new JButton("Save Changes");
+        btnSaveChanges.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    List<HierarchicalConfiguration> autochangeAttributes = configuration.configurationsAt("autochange.attributes");
+                    for (HierarchicalConfiguration configuration : autochangeAttributes) {
+                        valueMap.put(configuration.getString("name"),configuration.getString("values"));
+                    }
+                    configuration.save();
+                } catch (ConfigurationException e1) {
+                    View.getSingleton().showWarningDialog("Save Failed");
+                }
+            }
+        });
 		footerPanel.add(btnSaveChanges);
 		
 		JButton btnResetChanges = new JButton("Reset changes");
+        btnResetChanges.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initConfigurations();
+                initAttributes();
+            }
+        });
 		footerPanel.add(btnResetChanges);
 		
 		JButton btnExit = new JButton("Exit");
 		footerPanel.add(btnExit);
+        initConfigurations();
+        initAttributes();
 	}
 
-    private void initConfigutations() throws SAMLException {
-        configutation = (XMLConfiguration) SAMLUtils.getConfigutation();
+    private void initConfigurations() {
+        configuration = (XMLConfiguration) SAMLUtils.getConfigurations();
         valueMap = new LinkedHashMap<>();
-        List<HierarchicalConfiguration> autochangeAttributes = configutation.configurationsAt("autochange.attributes");
+        List<HierarchicalConfiguration> autochangeAttributes = configuration.configurationsAt("autochange.attributes");
         for (HierarchicalConfiguration configuration : autochangeAttributes) {
             valueMap.put(configuration.getString("name"),configuration.getString("values"));
         }
+        //todo : Breakadddialog class org.zaproxy.zap.extension.brk.impl.http
     }
 
     private void initAttributes(){
@@ -112,5 +142,30 @@ public class AutoChangerSettingUI extends JFrame {
             JButton btnRemoveAttribute = new JButton("Remove Attribute");
             panel.add(btnRemoveAttribute);
         }
+    }
+
+    @Override
+    public void onDesiredAttributeValueChange(String attribute, String value) {
+        onAddDesiredAttribute(attribute,value);
+        initAttributes();
+    }
+
+    @Override
+    public void onAddDesiredAttribute(String attribute, String values) {
+        valueMap.put(attribute,values);
+        initAttributes();
+    }
+
+    @Override
+    public void onDeleteDesiredAttribute(String attribute) {
+        if(valueMap.containsKey(attribute)){
+            valueMap.remove(attribute);
+            initAttributes();
+        }
+    }
+
+    @Override
+    public Set<String> getDesiredAttributes() {
+        return valueMap.keySet();
     }
 }
