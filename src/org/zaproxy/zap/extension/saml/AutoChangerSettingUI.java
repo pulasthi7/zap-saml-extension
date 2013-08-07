@@ -1,21 +1,30 @@
 package org.zaproxy.zap.extension.saml;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import javax.swing.JTextField;
 
 public class AutoChangerSettingUI extends JFrame {
 
 	private JPanel contentPane;
+    private JPanel attributePanel;
 
+    private XMLConfiguration configutation;
+
+    private Map<String,String> valueMap;
 	/**
 	 * Launch the application.
 	 */
@@ -48,28 +57,60 @@ public class AutoChangerSettingUI extends JFrame {
 		JLabel lblHeaderlabel = new JLabel("<html><h2>Add/Edit autochange attributes/values</h2><p>Following attributes will be changed to the given values automatically. Add/Edit the attributes and values below</p></html>");
 		contentPane.add(lblHeaderlabel, BorderLayout.NORTH);
 		
-		JPanel attributePanel = new JPanel();
-		contentPane.add(attributePanel, BorderLayout.CENTER);
+		JScrollPane attributeScrollPane = new JScrollPane();
+		contentPane.add(attributeScrollPane, BorderLayout.CENTER);
 		
+		attributePanel = new JPanel();
+		attributeScrollPane.setViewportView(attributePanel);
+		attributePanel.setLayout(new GridLayout(15, 1, 0, 0));
+
 		JPanel footerPanel = new JPanel();
 		contentPane.add(footerPanel, BorderLayout.SOUTH);
 		footerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		
 		JButton btnAdd = new JButton("Add more attributes");
 		footerPanel.add(btnAdd);
-		btnAdd.setSize(50, 20);
 		
 		JButton btnSaveChanges = new JButton("Save Changes");
 		footerPanel.add(btnSaveChanges);
-		btnSaveChanges.setSize(50, 20);
 		
 		JButton btnResetChanges = new JButton("Reset changes");
 		footerPanel.add(btnResetChanges);
-		btnResetChanges.setSize(50, 20);
 		
 		JButton btnExit = new JButton("Exit");
 		footerPanel.add(btnExit);
-		btnExit.setSize(50, 20);
 	}
 
+    private void initConfigutations() throws SAMLException {
+        configutation = (XMLConfiguration) SAMLUtils.getConfigutation();
+        valueMap = new LinkedHashMap<>();
+        List<HierarchicalConfiguration> autochangeAttributes = configutation.configurationsAt("autochange.attributes");
+        for (HierarchicalConfiguration configuration : autochangeAttributes) {
+            valueMap.put(configuration.getString("name"),configuration.getString("values"));
+        }
+    }
+
+    private void initAttributes(){
+
+        for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+            JPanel panel = new JPanel();
+            attributePanel.add(panel);
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+
+            JLabel lblAttribute = new JLabel(entry.getKey());
+            panel.add(lblAttribute);
+
+            JTextField txtValue = new JTextField();
+            lblAttribute.setLabelFor(txtValue);
+            txtValue.setText(entry.getValue());
+            panel.add(txtValue);
+            txtValue.setColumns(20);
+
+            JButton btnAddeditValues = new JButton("Add/Edit Values");
+            panel.add(btnAddeditValues);
+
+            JButton btnRemoveAttribute = new JButton("Remove Attribute");
+            panel.add(btnRemoveAttribute);
+        }
+    }
 }
