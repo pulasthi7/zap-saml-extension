@@ -12,6 +12,7 @@ import org.parosproxy.paros.model.HistoryReference;
 import org.parosproxy.paros.model.Session;
 import org.zaproxy.zap.extension.ExtensionPopupMenu;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
@@ -43,6 +44,17 @@ public class SAMLExtension extends ExtensionAdaptor {
 
             samlMenu.add(samlResendMenuItem);
             extensionHook.getHookMenu().addPopupMenuItem(samlMenu);
+
+            JMenuItem samlActiveEditorMenu = new JMenuItem("SAML Request Editor");
+            samlActiveEditorMenu.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    AutoChangerSettingUI settingUI = new AutoChangerSettingUI();
+                    settingUI.setVisible(true);
+                }
+            });
+
+            extensionHook.getHookMenu().addToolsMenuItem(samlActiveEditorMenu);
         }
 
     }
