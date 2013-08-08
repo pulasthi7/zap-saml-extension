@@ -1,26 +1,22 @@
 package org.zaproxy.zap.extension.saml;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.parosproxy.paros.view.View;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
-public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListner {
+public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListener {
 
-	private JPanel contentPane;
-    private JPanel attributePanel;
+    private JScrollPane attributeScrollPane;
 
-    private XMLConfiguration configuration;
+    private Properties configuration;
 
     private Map<String,String> valueMap;
 	/**
@@ -47,7 +43,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(800, 700);
 		setLocationRelativeTo(null);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
@@ -55,12 +51,10 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 		JLabel lblHeaderlabel = new JLabel("<html><h2>Add/Edit autochange attributes/values</h2><p>Following attributes will be changed to the given values automatically. Add/Edit the attributes and values below</p></html>");
 		contentPane.add(lblHeaderlabel, BorderLayout.NORTH);
 		
-		JScrollPane attributeScrollPane = new JScrollPane();
-		contentPane.add(attributeScrollPane, BorderLayout.CENTER);
+		attributeScrollPane = new JScrollPane();
+        contentPane.add(attributeScrollPane, BorderLayout.CENTER);
 		
-		attributePanel = new JPanel();
-		attributeScrollPane.setViewportView(attributePanel);
-		attributePanel.setLayout(new GridLayout(15, 1, 0, 0));
+
 
 		JPanel footerPanel = new JPanel();
 		contentPane.add(footerPanel, BorderLayout.SOUTH);
@@ -70,7 +64,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AddNewAttribute dialog = new AddNewAttribute();
+                AddNewAttribute dialog = new AddNewAttribute(AutoChangerSettingUI.this);
                 dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                 dialog.setVisible(true);
             }
@@ -82,12 +76,12 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    List<HierarchicalConfiguration> autochangeAttributes = configuration.configurationsAt("autochange.attributes");
-                    for (HierarchicalConfiguration configuration : autochangeAttributes) {
-                        valueMap.put(configuration.getString("name"),configuration.getString("values"));
+                    configuration.clear();
+                    for (Map.Entry<String, String> conf : valueMap.entrySet()) {
+                        configuration.put(conf.getKey(),conf.getValue());
                     }
-                    configuration.save();
-                } catch (ConfigurationException e1) {
+                    SAMLUtils.saveConfigurations(configuration);
+                } catch (SAMLException e1) {
                     View.getSingleton().showWarningDialog("Save Failed");
                 }
             }
@@ -111,17 +105,19 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 	}
 
     private void initConfigurations() {
-        configuration = (XMLConfiguration) SAMLUtils.getConfigurations();
+        configuration = SAMLUtils.loadConfigurations();
         valueMap = new LinkedHashMap<>();
-        List<HierarchicalConfiguration> autochangeAttributes = configuration.configurationsAt("autochange.attributes");
-        for (HierarchicalConfiguration configuration : autochangeAttributes) {
-            valueMap.put(configuration.getString("name"),configuration.getString("values"));
+
+        for (Map.Entry<Object, Object> attribute : configuration.entrySet()) {
+            valueMap.put(attribute.getKey().toString(),attribute.getValue().toString());
         }
         //todo : Breakadddialog class org.zaproxy.zap.extension.brk.impl.http
     }
 
     private void initAttributes(){
-
+        JPanel attributePanel = new JPanel();
+        attributeScrollPane.setViewportView(attributePanel);
+        attributePanel.setLayout(new GridLayout(15, 1, 0, 0));
         for (Map.Entry<String, String> entry : valueMap.entrySet()) {
             JPanel panel = new JPanel();
             attributePanel.add(panel);

@@ -15,8 +15,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -114,26 +113,34 @@ public class SAMLUtils {
      * Get the configuration for the ZAP SAML extension
      * @return
      */
-    public static Configuration getConfigurations() {
+    public static Properties loadConfigurations() {
 
-        XMLConfiguration config = null;
+        Properties config = new Properties();
         try {
-            config = new XMLConfiguration(getSamlConfFileName());
-        } catch (ConfigurationException e) {
-            log.warn("Configuration was not available, Creating new Configuration");
-        }
-        if(config == null){
-            config = new XMLConfiguration();
+            File savedPropertiesFile = new File(getSamlConfFileName());
+            if(savedPropertiesFile.exists()){
+                config.loadFromXML(new FileInputStream(savedPropertiesFile));
+            }
+        } catch (IOException e) {
+            log.warn("Error loading saved configurations, New configuration will be initiated");
         }
         return config;
+    }
+
+    public static void saveConfigurations(Properties p) throws SAMLException {
+        try {
+            p.storeToXML(new FileOutputStream(getSamlConfFileName()),"");
+        } catch (IOException e) {
+            throw new SAMLException("Couldn't save configuration",e);
+        }
     }
 
     public static String getSamlConfFileName(){
         return Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" + SAML_CONF_FILE_NAME;
     }
 
-    public static List<String> getSAMLAttributes(){
-        List<String> allAttibutes = new ArrayList<>();
+    public static Set<String> getSAMLAttributes(){
+        Set<String> allAttibutes = new HashSet<>();
         allAttibutes.add("AuthnRequest[ID]");
         allAttibutes.add("AuthnRequest[AssertionConsumerServiceURL]");
         allAttibutes.add("AuthnRequest[AttributeConsumingServiceIndex]");
