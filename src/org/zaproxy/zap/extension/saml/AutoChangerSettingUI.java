@@ -99,6 +99,12 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 		footerPanel.add(btnResetChanges);
 		
 		JButton btnExit = new JButton("Exit");
+        btnExit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AutoChangerSettingUI.this.setVisible(false);
+            }
+        });
 		footerPanel.add(btnExit);
         initConfigurations();
         initAttributes();
@@ -118,7 +124,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         JPanel attributePanel = new JPanel();
         attributeScrollPane.setViewportView(attributePanel);
         attributePanel.setLayout(new GridLayout(15, 1, 0, 0));
-        for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+        for (final Map.Entry<String, String> entry : valueMap.entrySet()) {
             JPanel panel = new JPanel();
             attributePanel.add(panel);
             panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
@@ -136,6 +142,15 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             panel.add(btnAddeditValues);
 
             JButton btnRemoveAttribute = new JButton("Remove Attribute");
+            btnRemoveAttribute.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int response = View.getSingleton().showConfirmDialog("Are you sure to remove the attribute");
+                    if(response == JOptionPane.YES_OPTION){
+                        onDeleteDesiredAttribute(entry.getKey());
+                    }
+                }
+            });
             panel.add(btnRemoveAttribute);
         }
     }

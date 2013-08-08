@@ -2,6 +2,8 @@ package org.zaproxy.zap.extension.saml;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -13,26 +15,27 @@ import javax.swing.JTextArea;
 
 public class ChangeAttribValueDialog extends JDialog {
 
-	private final JScrollPane contentPanel = new JScrollPane();
+    private JTextArea textAreaValues;
+    private final JScrollPane contentPanel = new JScrollPane();
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			ChangeAttribValueDialog dialog = new ChangeAttribValueDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		try {
+//			ChangeAttribValueDialog dialog = new ChangeAttribValueDialog();
+//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//			dialog.setVisible(true);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	/**
 	 * Create the dialog.
 	 */
-	public ChangeAttribValueDialog() {
-		setTitle("Add/Edit values");
+	public ChangeAttribValueDialog(final DesiredAttributeChangeListener listener, final String attribute, final String currentValues) {
+		setTitle("Add/Edit values for "+attribute);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -43,8 +46,14 @@ public class ChangeAttribValueDialog extends JDialog {
 			contentPanel.setColumnHeaderView(lblHeader);
 		}
 		{
-			JTextArea textAreaValues = new JTextArea();
-			contentPanel.setViewportView(textAreaValues);
+			textAreaValues = new JTextArea();
+            String[] values = currentValues.split(",");
+            StringBuilder valuesString = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                valuesString.append(values[i]).append("\n");
+            }
+            textAreaValues.setText(valuesString.toString());
+            contentPanel.setViewportView(textAreaValues);
 		}
 		{
 			JPanel buttonPane = new JPanel();
@@ -52,13 +61,32 @@ public class ChangeAttribValueDialog extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
+				okButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String[] values = textAreaValues.getText().split(",");
+                        StringBuilder valuesString = new StringBuilder();
+                        for (int i = 0; i < values.length; i++) {
+                            if(i!=0){
+                                valuesString.append(",");
+                            }
+                            valuesString.append(values[i]);
+                        }
+                        listener.onDesiredAttributeValueChange(attribute,valuesString.toString());
+                        ChangeAttribValueDialog.this.setVisible(false);
+                    }
+                });
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ChangeAttribValueDialog.this.setVisible(false);
+                    }
+                });
 				buttonPane.add(cancelButton);
 			}
 		}
