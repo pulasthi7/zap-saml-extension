@@ -1,32 +1,38 @@
 package org.zaproxy.zap.extension.saml;
 
+import org.parosproxy.paros.view.View;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Set;
 
 public class AddNewAttribute extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private JLabel lblAttributeName;
+	private JComboBox comboBoxAttribSelect;
+    JTextArea textAreaAttribValues;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			AddNewAttribute dialog = new AddNewAttribute();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		try {
+//			AddNewAttribute dialog = new AddNewAttribute();
+//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//			dialog.setVisible(true);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	/**
 	 * Create the dialog.
 	 */
-	public AddNewAttribute() {
-		setTitle("Add New Attribute");
+	public AddNewAttribute(final DesiredAttributeChangeListener listener) {
+        setTitle("Add New Attribute");
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -39,13 +45,14 @@ public class AddNewAttribute extends JDialog {
 			flowLayout.setAlignment(FlowLayout.LEFT);
 			contentPanel.add(attribNamePanel, BorderLayout.NORTH);
 			{
-				lblAttributeName = new JLabel("Attribute Name");
-				attribNamePanel.add(lblAttributeName);
-			}
-			{
-				JComboBox comboBoxAttribSelect = new JComboBox();
-				lblAttributeName.setLabelFor(comboBoxAttribSelect);
-				comboBoxAttribSelect.setMaximumRowCount(5);
+                attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
+				comboBoxAttribSelect = new JComboBox();
+                for (String attribute : SAMLUtils.getSAMLAttributes()) {
+                    if(!listener.getDesiredAttributes().contains(attribute)){
+                        comboBoxAttribSelect.addItem(attribute);
+                    }
+                }
+                comboBoxAttribSelect.setMaximumRowCount(5);
 				attribNamePanel.add(comboBoxAttribSelect);
 			}
 		}
@@ -62,24 +69,54 @@ public class AddNewAttribute extends JDialog {
 				JScrollPane scrollPaneAttribValues = new JScrollPane();
 				attribValuesPanel.add(scrollPaneAttribValues, BorderLayout.CENTER);
 				{
-					JTextArea textAreaAttribValues = new JTextArea();
-					scrollPaneAttribValues.setViewportView(textAreaAttribValues);
+					textAreaAttribValues = new JTextArea();
+                    scrollPaneAttribValues.setViewportView(textAreaAttribValues);
 				}
 			}
 		}
 		{
-			JPanel buttonPane = new JPanel();
+			final JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
+				final JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if(comboBoxAttribSelect.getSelectedItem()==null){
+                            View.getSingleton().showWarningDialog("No Attribute selected, " +
+                                    "please select one from combo box");
+                            return;
+                        }
+                        String[] values = textAreaAttribValues.getText().split("\n");
+                        if(values.length==0){
+                            View.getSingleton().showWarningDialog("No values given, " +
+                                    "please provide values, one per line");
+                            return;
+                        }
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (int i = 0; i < values.length; i++) {
+                            if(i!=0){
+                                stringBuilder.append(",");
+                            }
+                            stringBuilder.append(values[i]);
+                        }
+                        listener.onAddDesiredAttribute(comboBoxAttribSelect.getSelectedItem().toString(),
+                                stringBuilder.toString());
+                        AddNewAttribute.this.setVisible(false);
+                    }
+                });
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        AddNewAttribute.this.setVisible(false);
+                    }
+                });
 				buttonPane.add(cancelButton);
 			}
 		}
