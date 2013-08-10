@@ -39,6 +39,10 @@ public class SAMLExtension extends ExtensionAdaptor {
         super.hook(extensionHook);
 
         if (getView() != null) {
+
+            final SAMLProxyListener proxyListener = new SAMLProxyListener();
+            extensionHook.addProxyListener(proxyListener);
+
             ExtensionPopupMenu samlMenu = new ExtensionPopupMenu("SAML Actions");
             ExtensionPopupMenuItem samlResendMenuItem = new SAMLResendMenuItem("Resend...");
 
@@ -49,12 +53,13 @@ public class SAMLExtension extends ExtensionAdaptor {
             samlActiveEditorMenu.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    AutoChangerSettingUI settingUI = new AutoChangerSettingUI();
+                    AutoChangerSettingUI settingUI = new AutoChangerSettingUI(proxyListener);
                     settingUI.setVisible(true);
                 }
             });
 
             extensionHook.getHookMenu().addToolsMenuItem(samlActiveEditorMenu);
+
         }
 
     }

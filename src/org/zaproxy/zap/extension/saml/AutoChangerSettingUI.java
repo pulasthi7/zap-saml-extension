@@ -19,26 +19,11 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
     private Properties configuration;
 
     private Map<String,String> valueMap;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AutoChangerSettingUI frame = new AutoChangerSettingUI();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
 	 */
-	public AutoChangerSettingUI() {
+	public AutoChangerSettingUI(final SAMLProxyListener listener) {
 		setTitle("SAML Automatic Request Changer Settings");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(800, 700);
@@ -81,6 +66,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
                         configuration.put(conf.getKey(),conf.getValue());
                     }
                     SAMLUtils.saveConfigurations(configuration);
+                    listener.loadAutoChangeAttributes();
                 } catch (SAMLException e1) {
                     View.getSingleton().showWarningDialog("Save Failed");
                 }
