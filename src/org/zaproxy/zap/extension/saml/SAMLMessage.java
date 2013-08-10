@@ -36,14 +36,12 @@ import java.util.Set;
 public class SAMLMessage {
     private String originalMessage;
     private Map<String, String> attributeMapping;
-    private String samlParameter;
     private XMLObject unmarshalledObject;
 
-    public SAMLMessage(String originalMessage, String samlParameter) {
+    public SAMLMessage(String originalMessage) {
         try {
             DefaultBootstrap.bootstrap();
             this.originalMessage = originalMessage;
-            this.samlParameter = samlParameter;
         } catch (ConfigurationException e) {
 
         }
@@ -54,10 +52,6 @@ public class SAMLMessage {
      */
     public void resetMessage() {
         unmarshalledObject = null;
-    }
-
-    public String getSamlParameter() {
-        return samlParameter;
     }
 
     /**
