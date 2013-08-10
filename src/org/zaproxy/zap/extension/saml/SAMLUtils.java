@@ -7,6 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 import org.parosproxy.paros.extension.encoder.Base64;
 import org.parosproxy.paros.model.Model;
+import org.parosproxy.paros.network.HtmlParameter;
+import org.parosproxy.paros.network.HttpMessage;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -15,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
@@ -172,5 +175,57 @@ public class SAMLUtils {
         allAttibutes.add("Assertion:AuthnStatement:AuthnContext:AuthnContextClassRef");
 
         return allAttibutes;
+    }
+
+    public static boolean hasSAMLMessage(HttpMessage message){
+        for (HtmlParameter parameter : message.getUrlParams()) {
+            if(parameter.getName().equals("SAMLRequest") && hasValue(parameter.getValue())){
+                return true;
+            }
+            if(parameter.getName().equals("SAMLResponse") && hasValue(parameter.getValue())){
+                return true;
+            }
+        }
+        for (HtmlParameter parameter : message.getFormParams()) {
+            if(parameter.getName().equals("SAMLRequest") && hasValue(parameter.getValue())){
+                return true;
+            }
+            if(parameter.getName().equals("SAMLResponse") && hasValue(parameter.getValue())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasValue(String param){
+        if(param!=null){
+            return !"".equals(param);
+        }
+        return false;
+    }
+
+    /**
+     * Decode the SAML messages based on the binding used
+     * @param val the SAML message to decode
+     * @param binding The binding used
+     * @return The decoded SAML message if success, or the original string if failed
+     */
+    public static String extractSAMLMessage(String val, Binding binding){
+        try {
+            switch (binding) {
+                case HTTPPost:
+                    val = URLDecoder.decode(val, "UTF-8");
+                case HTTPRedirect:
+                    byte[] b64decoded = b64Decode(val);
+                    return inflateMessage(b64decoded);
+                default:
+                    break;
+            }
+        } catch (UnsupportedEncodingException e) {
+
+        } catch (SAMLException e) {
+
+        }
+        return val;
     }
 }

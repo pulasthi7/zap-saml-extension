@@ -13,7 +13,7 @@ public class SAMLResendMenuItem extends PopupMenuHttpMessage {
 
     @Override
     public void performAction(HttpMessage httpMessage) throws Exception {
-        if(!isSAMLMessage(httpMessage)){
+        if(!SAMLUtils.hasSAMLMessage(httpMessage)){
             View.getSingleton().showWarningDialog("Not a valid SAML request");
             return;
         }
@@ -27,30 +27,4 @@ public class SAMLResendMenuItem extends PopupMenuHttpMessage {
         return true;
     }
 
-    private boolean isSAMLMessage(HttpMessage message){
-        for (HtmlParameter parameter : message.getUrlParams()) {
-            if(parameter.getName().equals("SAMLRequest") && hasValue(parameter.getValue())){
-                return true;
-            }
-            if(parameter.getName().equals("SAMLResponse") && hasValue(parameter.getValue())){
-                return true;
-            }
-        }
-        for (HtmlParameter parameter : message.getFormParams()) {
-            if(parameter.getName().equals("SAMLRequest") && hasValue(parameter.getValue())){
-                return true;
-            }
-            if(parameter.getName().equals("SAMLResponse") && hasValue(parameter.getValue())){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasValue(String param){
-        if(param!=null){
-            return !"".equals(param);
-        }
-        return false;
-    }
 }

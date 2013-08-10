@@ -146,7 +146,7 @@ public class SAMLRequestEditor{
 
                 @Override
                 public void focusLost(FocusEvent e) {
-                    samlMessage = new SAMLMessage(samlMsgTxtArea.getText(),samlMessage.getSamlParameter());
+                    samlMessage = new SAMLMessage(samlMsgTxtArea.getText());
                     initSAMLAttributes();
                 }
             });
@@ -243,8 +243,8 @@ public class SAMLRequestEditor{
     private void setMessage(){
         for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
             if(urlParameter.getName().equals("SAMLRequest")||urlParameter.getName().equals("SAMLResponse")){
-                String msgString = extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect);
-                samlMessage = new SAMLMessage(msgString,urlParameter.getName());
+                String msgString = SAMLUtils.extractSAMLMessage(urlParameter.getValue(), Binding.HTTPRedirect);
+                samlMessage = new SAMLMessage(msgString);
                 samlBinding = Binding.HTTPRedirect;
                 samlParameter = urlParameter.getName();
             } else if(urlParameter.getName().equals("RelayState")){
@@ -254,8 +254,8 @@ public class SAMLRequestEditor{
 
         for (HtmlParameter formParameter : httpMessage.getFormParams()) {
             if(formParameter.getName().equals("SAMLRequest")||formParameter.getName().equals("SAMLResponse")){
-                String msgString = extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);
-                samlMessage = new SAMLMessage(msgString,formParameter.getName());
+                String msgString = SAMLUtils.extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);
+                samlMessage = new SAMLMessage(msgString);
                 samlBinding = Binding.HTTPPost;
                 samlParameter = formParameter.getName();
             }else if(formParameter.getName().equals("RelayState")){
@@ -263,32 +263,6 @@ public class SAMLRequestEditor{
             }
         }
     }
-
-    /**
-     * Decode the SAML messages based on the binding used
-     * @param val the SAML message to decode
-     * @param binding The binding used
-     * @return The decoded SAML message if success, or the original string if failed
-     */
-    private String extractSAMLMessage(String val, Binding binding){
-        try {
-            switch (binding) {
-                case HTTPPost:
-                    val = URLDecoder.decode(val,"UTF-8");
-                case HTTPRedirect:
-                    byte[] b64decoded = SAMLUtils.b64Decode(val);
-                    return SAMLUtils.inflateMessage(b64decoded);
-                default:
-                    break;
-            }
-        } catch (UnsupportedEncodingException e) {
-
-        } catch (SAMLException e) {
-
-        }
-        return val;
-    }
-
 
     /**
      * Shows the extension UI
