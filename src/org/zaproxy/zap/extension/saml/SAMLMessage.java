@@ -42,16 +42,38 @@ public class SAMLMessage {
         try {
             DefaultBootstrap.bootstrap();
             this.originalMessage = originalMessage;
+            buildUnmarshalledObject();
         } catch (ConfigurationException e) {
 
+        } catch (SAMLException e) {
+
+        }
+    }
+
+    private void buildUnmarshalledObject() throws SAMLException {
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder docBuilder = null;
+            docBuilder = documentBuilderFactory.newDocumentBuilder();
+            ByteArrayInputStream is = new ByteArrayInputStream(originalMessage.getBytes("UTF-8"));
+
+            Document document = docBuilder.parse(is);
+            Element element = document.getDocumentElement();
+            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+            unmarshalledObject = unmarshaller.unmarshall(element);
+        } catch (Exception e) {
+            throw new SAMLException("Error in extracting the attributes", e);
         }
     }
 
     /**
      * Reset the message (which might have changed from original one) back to original message
      */
-    public void resetMessage() {
+    public void resetMessage() throws SAMLException {
         unmarshalledObject = null;
+        buildUnmarshalledObject();
     }
 
     /**
@@ -106,18 +128,7 @@ public class SAMLMessage {
      */
     private void extractAttributes() throws SAMLException {
         try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setNamespaceAware(true);
-            DocumentBuilder docBuilder = null;
-            docBuilder = documentBuilderFactory.newDocumentBuilder();
-            ByteArrayInputStream is = new ByteArrayInputStream(originalMessage.getBytes("UTF-8"));
-
-            Document document = docBuilder.parse(is);
-            Element element = document.getDocumentElement();
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
-            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
-            unmarshalledObject = unmarshaller.unmarshall(element);
-            attributeMapping = new LinkedHashMap<>();
+            buildUnmarshalledObject();
             attributeMapping = new LinkedHashMap<>();
             for (String attribute : getSelectedAttributes()) {
                 String value = getValueOf(attribute);
@@ -404,7 +415,7 @@ public class SAMLMessage {
      * @throws SAMLException if value type is not accepted by key
      */
     private boolean setResponseValue(String key, String value) throws SAMLException {
-        if (!(unmarshalledObject instanceof AuthnRequest)) {
+        if (!(unmarshalledObject instanceof Response)) {
             return false;
         }
         Response response = (Response) unmarshalledObject;
