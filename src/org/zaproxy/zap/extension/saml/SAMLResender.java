@@ -8,11 +8,7 @@ import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.network.HttpSender;
 
-import java.awt.*;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.TreeSet;
 
 public class SAMLResender {
     
@@ -56,27 +52,16 @@ public class SAMLResender {
         HttpSender sender = new HttpSender(Model.getSingleton().getOptionsParam().getConnectionParam(),true,
                 HttpSender.MANUAL_REQUEST_INITIATOR);
         try {
-            sender.sendAndReceive(msg);
-            EventQueue.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    if (!msg.getResponseHeader().isEmpty()) {
-                        final ExtensionHistory extension = (ExtensionHistory) Control.getSingleton()
-                                .getExtensionLoader().getExtension(ExtensionHistory.NAME);
+            sender.sendAndReceive(msg,true);
+            if (!msg.getResponseHeader().isEmpty()) {
+                final ExtensionHistory extension = (ExtensionHistory) Control.getSingleton()
+                        .getExtensionLoader().getExtension(ExtensionHistory.NAME);
 
-                        final int finalType = HistoryReference.TYPE_MANUAL;
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                extension.addHistory(msg,
-                                        finalType);
-                            }
-                        });
-                        t.start();
-                    }
-                }
-            });
-        } catch (IOException|InterruptedException|InvocationTargetException e) {
+                final int finalType = HistoryReference.TYPE_MANUAL;
+                extension.addHistory(msg,finalType);
+            }
+
+        } catch (IOException e) {
             throw new SAMLException("Message sending failed",e);
         }
     }
