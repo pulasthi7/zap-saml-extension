@@ -1,5 +1,7 @@
 package org.zaproxy.zap.extension.saml;
 
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.httpclient.URIException;
 import org.parosproxy.paros.control.Control;
 import org.parosproxy.paros.extension.history.ExtensionHistory;
 import org.parosproxy.paros.model.HistoryReference;
@@ -28,17 +30,39 @@ public class SAMLResender {
         String encodedSAMLMessage = SAMLUtils.b64Encode(SAMLUtils.deflateMessage(samlMessage));
         switch (samlMsgBinding){
             case HTTPPost:
-                for (HtmlParameter param : msg.getFormParams()) {
-                    if(param.getName().equals(samlParam)){
-                        param.setValue(encodedSAMLMessage);
+                String paramString = msg.getRequestBody().toString();
+                String[] params = paramString.split("&");
+                StringBuilder newParamBuilder = new StringBuilder();
+                for (int i = 0; i < params.length; i++) {
+                    if(params[i].startsWith(samlParam)){
+                        newParamBuilder.append(samlParam + "=" + encodedSAMLMessage);
+                    }else{
+                        newParamBuilder.append(params[i]); //No change needed;
+                    }
+                    if(i<params.length-1){
+                        newParamBuilder.append("&");  //add '&' between params for separation
                     }
                 }
+                msg.setRequestBody(newParamBuilder.toString());
                 break;
+
             case HTTPRedirect:
-                for (HtmlParameter param : msg.getUrlParams()) {
-                    if(param.getName().equals(samlParam)){
-                        param.setValue(encodedSAMLMessage);
+                try {
+                    paramString = msg.getRequestHeader().getURI().getQuery();
+                    params = paramString.split("&");
+                    newParamBuilder = new StringBuilder();
+                    for (int i = 0; i < params.length; i++) {
+                        if(params[i].startsWith(samlParam)){
+                            newParamBuilder.append(samlParam + "=" + encodedSAMLMessage);
+                        }else{
+                            newParamBuilder.append(params[i]); //No change needed;
+                        }
+                        if(i<params.length-1){
+                            newParamBuilder.append("&");  //add '&' between params for separation
+                        }
                     }
+                    msg.getRequestHeader().getURI().setQuery(newParamBuilder.toString());
+                } catch (URIException e) {
                 }
                 break;
         }
