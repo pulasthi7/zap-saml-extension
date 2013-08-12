@@ -31,6 +31,7 @@ import java.util.zip.Inflater;
 public class SAMLUtils {
     private static final int MAX_INFLATED_SIZE = 5000;
     private static final String SAML_CONF_FILE_NAME = "saml.conf";
+    private static Properties samlAttributeNames;
 
     protected static Logger log = Logger.getLogger(SAMLUtils.class);
     /**
@@ -175,6 +176,22 @@ public class SAMLUtils {
         allAttibutes.add("Assertion:AuthnStatement:AuthnContext:AuthnContextClassRef");
 
         return allAttibutes;
+    }
+
+    public static String getAttributeViewValue(String attibuteName){
+        if(samlAttributeNames==null){
+            try {
+                samlAttributeNames = new Properties();
+                samlAttributeNames.load(SAMLUtils.class.getResourceAsStream("attributes.properties"));
+            } catch (IOException e) {
+                log.error("Error loading attributes.properties file");
+                return "";
+            }
+        }
+        if(samlAttributeNames.containsKey(attibuteName)){
+            return samlAttributeNames.get(attibuteName).toString();
+        }
+        return "";
     }
 
     public static boolean hasSAMLMessage(HttpMessage message){

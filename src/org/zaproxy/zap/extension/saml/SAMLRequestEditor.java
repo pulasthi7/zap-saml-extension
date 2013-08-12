@@ -26,7 +26,6 @@ public class SAMLRequestEditor {
     private JTextArea responseHeaderTextArea;           //Text area to display the http headers of the response
     private JTextArea responseBodyTextArea;             //Text area to display the http response body
 
-    private JPanel attribPanel;                         //The panel to display the saml attribute name/value pairs
     private JScrollPane reqAttribScrollPane;            //Scroll pane to give the scrollability to attrib panel
 
     private JTextArea samlMsgTxtArea;                   //The text area to display the decoded saml message
@@ -154,9 +153,9 @@ public class SAMLRequestEditor {
      * Initialize the SAML attributes (label, value pairs)
      */
     private void initSAMLAttributes() {
-        attribPanel = new JPanel();
+        JPanel attribPanel = new JPanel();
         attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
-        Map<String, String> samlAttributes = null;
+        Map<String, String> samlAttributes;
         try {
             samlAttributes = samlMessage.getAttributeMapping();
             for (final Map.Entry<String, String> entry : samlAttributes.entrySet()) {
@@ -167,7 +166,7 @@ public class SAMLRequestEditor {
                 sPane.setDividerLocation(300);
                 sPane.setDividerSize(0);
 
-                lbl.setText(entry.getKey());
+                lbl.setText(SAMLUtils.getAttributeViewValue(entry.getKey()));
                 sPane.setLeftComponent(lbl);
 
                 txtValue.setText(entry.getValue());

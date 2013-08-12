@@ -103,7 +103,6 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         for (Map.Entry<Object, Object> attribute : configuration.entrySet()) {
             valueMap.put(attribute.getKey().toString(),attribute.getValue().toString());
         }
-        //todo : Breakadddialog class org.zaproxy.zap.extension.brk.impl.http
     }
 
     private void initAttributes(){
@@ -115,7 +114,11 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             attributePanel.add(panel);
             panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-            JLabel lblAttribute = new JLabel(entry.getKey());
+            JLabel lblAttribute = new JLabel(SAMLUtils.getAttributeViewValue(entry.getKey()));
+            Dimension size = lblAttribute.getPreferredSize();
+            size.width = 200;
+            lblAttribute.setMinimumSize(size);
+            lblAttribute.setPreferredSize(size);
             panel.add(lblAttribute);
 
             JTextField txtValue = new JTextField();

@@ -49,7 +49,7 @@ public class AddNewAttribute extends JDialog {
 				comboBoxAttribSelect = new JComboBox();
                 for (String attribute : SAMLUtils.getSAMLAttributes()) {
                     if(!listener.getDesiredAttributes().contains(attribute)){
-                        comboBoxAttribSelect.addItem(attribute);
+                        comboBoxAttribSelect.addItem(SAMLUtils.getAttributeViewValue(attribute));
                     }
                 }
                 comboBoxAttribSelect.setMaximumRowCount(5);
@@ -101,8 +101,13 @@ public class AddNewAttribute extends JDialog {
                             }
                             stringBuilder.append(values[i]);
                         }
-                        listener.onAddDesiredAttribute(comboBoxAttribSelect.getSelectedItem().toString(),
-                                stringBuilder.toString());
+                        String attribute = comboBoxAttribSelect.getSelectedItem().toString();
+                        for (String s : SAMLUtils.getSAMLAttributes()) {
+                            if(SAMLUtils.getAttributeViewValue(s).equals(attribute)){
+                                listener.onAddDesiredAttribute(s,stringBuilder.toString());
+                                break;
+                            }
+                        }
                         AddNewAttribute.this.setVisible(false);
                     }
                 });
