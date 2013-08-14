@@ -130,7 +130,7 @@ public class SAMLMessage {
         try {
             buildUnmarshalledObject();
             attributeMapping = new LinkedHashMap<>();
-            for (String attribute : getSelectedAttributes()) {
+            for (String attribute : SAMLUtils.getSAMLAttributes()) {
                 String value = getValueOf(attribute);
                 if (value != null && !"".equals(value)) {
                     attributeMapping.put(attribute, value);
@@ -139,46 +139,6 @@ public class SAMLMessage {
         } catch (Exception e) {
             throw new SAMLException("Error in extracting the attributes", e);
         }
-    }
-
-    /**
-     * Get the user preferred attributes to be shown in the attribute list
-     * @return Set o
-     */
-    private Set<String> getSelectedAttributes() {
-        //Hardcoded to show all attributes (if available) for now. will be taken from a config file later
-        Set<String> result = new HashSet<>();
-        result.add("AuthnRequest[ID]");
-        result.add("AuthnRequest[AssertionConsumerServiceURL]");
-        result.add("AuthnRequest[AttributeConsumingServiceIndex]");
-        result.add("AuthnRequest[IssueInstant]");
-        result.add("AuthnRequest[ProtocolBinding]");
-        result.add("AuthnRequest[Version]");
-        result.add("AuthnRequest:Issuer");
-        result.add("AuthnRequest:NameIDPolicy[Format]");
-        result.add("AuthnRequest:NameIDPolicy[SPNameQualifier]");
-        result.add("AuthnRequest:NameIDPolicy[AllowCreate]");
-        result.add("AuthnRequest:RequestedAuthnContext[Comparison]");
-        result.add("AuthnRequest:RequestedAuthnContext:AuthnContextClassRef");
-
-        result.add("Assertion[ID]");
-        result.add("Assertion[IssueInstant]");
-        result.add("Assertion[Version]");
-        result.add("Assertion:Issuer");
-        result.add("Assertion:Issuer[Format]");
-        result.add("Assertion:Subject:NameID");
-        result.add("Assertion:Subject:SubjectConfirmation[Method]");
-        result.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[InResponseTo]");
-        result.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[Recipient]");
-        result.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[NotOnOrAfter]");
-        result.add("Assertion:Conditions[NotOnOrAfter]");
-        result.add("Assertion:Conditions[NotBefore]");
-        result.add("Assertion:Conditions:AudienceRestriction:Audience");
-        result.add("Assertion:AuthnStatement[AuthnInstant]");
-        result.add("Assertion:AuthnStatement[SessionIndex]");
-        result.add("Assertion:AuthnStatement:AuthnContext:AuthnContextClassRef");
-
-        return result;
     }
 
     /**
