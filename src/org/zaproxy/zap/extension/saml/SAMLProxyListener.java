@@ -8,7 +8,7 @@ import org.parosproxy.paros.network.HttpMessage;
 import java.util.Map;
 import java.util.Properties;
 
-public class SAMLProxyListener implements ProxyListener{
+public class SAMLProxyListener implements ProxyListener {
 
     private boolean active;
     private Properties autoChangeAttribs;
@@ -19,33 +19,33 @@ public class SAMLProxyListener implements ProxyListener{
         setActive(true);
     }
 
-    public void setActive(boolean value){
+    public void setActive(boolean value) {
         active = value;
-        if(active && autoChangeAttribs == null){
+        if (active && autoChangeAttribs == null) {
             loadAutoChangeAttributes();
         }
     }
 
     @Override
     public boolean onHttpRequestSend(HttpMessage message) {
-        if(active && SAMLUtils.hasSAMLMessage(message)){
+        if (active && SAMLUtils.hasSAMLMessage(message)) {
             String samlParameter = null;
             SAMLMessage samlMessage = null;
             Binding binding = null;
 
             //search the url parameters for saml message
             for (HtmlParameter parameter : message.getUrlParams()) {
-                if("SAMLRequest".equals(parameter.getName())||"SAMLResponse".equals(parameter.getName())){
+                if ("SAMLRequest".equals(parameter.getName()) || "SAMLResponse".equals(parameter.getName())) {
                     samlParameter = parameter.getName();
                     binding = Binding.HTTPRedirect;
-                    samlMessage = new SAMLMessage(SAMLUtils.extractSAMLMessage(parameter.getValue(),binding));
+                    samlMessage = new SAMLMessage(SAMLUtils.extractSAMLMessage(parameter.getValue(), binding));
                     break;
                 }
             }
 
             //search the post parameters for saml message
             for (HtmlParameter parameter : message.getFormParams()) {
-                if("SAMLRequest".equals(parameter.getName())||"SAMLResponse".equals(parameter.getName())){
+                if ("SAMLRequest".equals(parameter.getName()) || "SAMLResponse".equals(parameter.getName())) {
                     samlParameter = parameter.getName();
                     binding = Binding.HTTPPost;
                     samlMessage = new SAMLMessage(SAMLUtils.extractSAMLMessage(parameter.getValue(), binding));
@@ -58,18 +58,18 @@ public class SAMLProxyListener implements ProxyListener{
                 //todo:for now, only the first value is taken into consideration, need to fix this
                 String value = entry.getValue().toString().split(",")[0];
                 try {
-                    samlMessage.setValueTo(entry.getKey().toString(),value);
+                    samlMessage.setValueTo(entry.getKey().toString(), value);
                 } catch (SAMLException e) {
                     //Exception can be ignored, as the message may not contain the attribute
-                    log.debug("Value "+value+" could not be set for "+entry.getKey());
+                    log.debug("Value " + value + " could not be set for " + entry.getKey());
                 }
             }
 
             //rebuild the message
             try {
-                SAMLResender.buildSAMLRequest(message,samlParameter,samlMessage.getPrettyFormattedMessage(),binding);
+                SAMLResender.buildSAMLRequest(message, samlParameter, samlMessage.getPrettyFormattedMessage(), binding);
             } catch (SAMLException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                log.error("SAML Attribute change process failed." + e.getMessage());
             }
 
         }
@@ -86,7 +86,7 @@ public class SAMLProxyListener implements ProxyListener{
         return 0;
     }
 
-    public void loadAutoChangeAttributes(){
+    public void loadAutoChangeAttributes() {
         autoChangeAttribs = SAMLUtils.loadConfigurations();
     }
 }
