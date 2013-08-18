@@ -12,7 +12,7 @@ import java.util.Set;
 public class AddNewAttribute extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private JComboBox comboBoxAttribSelect;
+    private JComboBox comboBoxAttribSelect;
     JTextArea textAreaAttribValues;
 
 //	/**
@@ -126,5 +126,14 @@ public class AddNewAttribute extends JDialog {
 			}
 		}
 	}
+
+    public JComboBox getComboBoxAttribSelect() {
+        return comboBoxAttribSelect;
+    }
+
+    public JTextArea getTextAreaAttribValues() {
+        return textAreaAttribValues;
+    }
+
 
 }

@@ -114,7 +114,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             attributePanel.add(panel);
             panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-            JLabel lblAttribute = new JLabel(SAMLUtils.getAttributeViewValue(entry.getKey()));
+            final JLabel lblAttribute = new JLabel(SAMLUtils.getAttributeViewValue(entry.getKey()));
             Dimension size = lblAttribute.getPreferredSize();
             size.width = 200;
             lblAttribute.setMinimumSize(size);
@@ -128,6 +128,16 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             txtValue.setColumns(20);
 
             JButton btnAddeditValues = new JButton("Add/Edit Values");
+            btnAddeditValues.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    AddNewAttribute editDialog = new AddNewAttribute(AutoChangerSettingUI.this);
+                    editDialog.getComboBoxAttribSelect().removeAllItems();
+                    editDialog.getComboBoxAttribSelect().addItem(lblAttribute.getText());
+                    editDialog.getTextAreaAttribValues().setText(entry.getValue().replaceAll(",","\n"));
+                    editDialog.setVisible(true);
+                }
+            });
             panel.add(btnAddeditValues);
 
             JButton btnRemoveAttribute = new JButton("Remove Attribute");
