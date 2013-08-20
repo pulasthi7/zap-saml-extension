@@ -144,7 +144,8 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             btnRemoveAttribute.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int response = View.getSingleton().showConfirmDialog("Are you sure to remove the attribute");
+                    int response = JOptionPane.showConfirmDialog(AutoChangerSettingUI.this,
+                            "Are you sure to remove the attribute","Confirm",JOptionPane.YES_NO_OPTION);
                     if(response == JOptionPane.YES_OPTION){
                         onDeleteDesiredAttribute(entry.getKey());
                     }
