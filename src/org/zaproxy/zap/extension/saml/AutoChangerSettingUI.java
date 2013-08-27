@@ -4,6 +4,7 @@ import org.parosproxy.paros.view.View;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,8 +33,8 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-		
-		JLabel lblHeaderlabel = new JLabel("<html><h2>Add/Edit autochange attributes/values</h2><p>Following attributes will be changed to the given values automatically. Add/Edit the attributes and values below</p></html>");
+
+		JLabel lblHeaderlabel = new JLabel("<html><h2>SAML Settings</h2></html>");
 		contentPane.add(lblHeaderlabel, BorderLayout.NORTH);
 		
 		attributeScrollPane = new JScrollPane();
@@ -108,9 +109,16 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
     private void initAttributes(){
         JPanel attributePanel = new JPanel();
         attributeScrollPane.setViewportView(attributePanel);
-        attributePanel.setLayout(new GridLayout(15, 1, 0, 0));
+        attributePanel.setLayout(new GridLayout(Math.max(valueMap.size()+1,15), 1, 5, 0));
+        attributePanel.setBorder(new TitledBorder("SAML Attributes to be changed automatically"));
+        JPanel panel = new JPanel();
+        attributePanel.add(panel);
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        JLabel lblHeader = new JLabel("<html><p>Following attributes will be changed to the given values " +
+                "automatically. Add/Edit the attributes and values below </p></html>");
+        panel.add(lblHeader);
         for (final Map.Entry<String, String> entry : valueMap.entrySet()) {
-            JPanel panel = new JPanel();
+            panel = new JPanel();
             attributePanel.add(panel);
             panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
@@ -153,6 +161,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             });
             panel.add(btnRemoveAttribute);
         }
+
     }
 
     @Override
