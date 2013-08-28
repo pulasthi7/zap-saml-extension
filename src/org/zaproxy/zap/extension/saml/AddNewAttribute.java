@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 public class AddNewAttribute extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-    private JComboBox comboBoxAttribSelect;
+    private JComboBox<String> comboBoxAttribSelect;
     private JTextArea textAreaAttribValues;
 
 //	/**
@@ -45,7 +45,7 @@ public class AddNewAttribute extends JDialog {
 			contentPanel.add(attribNamePanel, BorderLayout.NORTH);
 			{
                 attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
-				comboBoxAttribSelect = new JComboBox();
+				comboBoxAttribSelect = new JComboBox<>();
                 for (String attribute : SAMLUtils.getSAMLAttributes()) {
                     if(!listener.getDesiredAttributes().contains(attribute)){
                         comboBoxAttribSelect.addItem(SAMLUtils.getAttributeViewValue(attribute));
@@ -126,7 +126,7 @@ public class AddNewAttribute extends JDialog {
 		}
 	}
 
-    public JComboBox getComboBoxAttribSelect() {
+    public JComboBox<String> getComboBoxAttribSelect() {
         return comboBoxAttribSelect;
     }
 
