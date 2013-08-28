@@ -7,13 +7,12 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Set;
 
 public class AddNewAttribute extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
     private JComboBox comboBoxAttribSelect;
-    JTextArea textAreaAttribValues;
+    private JTextArea textAreaAttribValues;
 
 //	/**
 //	 * Launch the application.
