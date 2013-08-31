@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:samlConfigData xmlns:ns2="org.zaproxy.zap.extension.saml">
+    <autoChangerEnabled>false</autoChangerEnabled>
+    <xswEnabled>false</xswEnabled>
+    <AutoChangeAttributes/>
     <AllAttributes>
         <Attribute>
             <name>Auth_ACS_URL</name>
@@ -43,7 +46,6 @@
             <viewName>Auth:Issuer</viewName>
             <xPath>/AuthnRequest/Issuer</xPath>
         </Attribute>
-
         <Attribute>
             <name>Resp_ID</name>
             <valueType>String</valueType>
