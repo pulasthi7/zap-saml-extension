@@ -4,91 +4,79 @@
         <name>Auth_ACS_URL</name>
         <valueType>String</valueType>
         <viewName>Auth:ACS URL</viewName>
-        <xPath>//samlp:AuthnRequest/@AssertionConsumerServiceURL</xPath>
+        <xPath>/AuthnRequest/@AssertionConsumerServiceURL</xPath>
     </attributes>
     <attributes>
         <name>Auth_ID</name>
         <valueType>Integer</valueType>
         <viewName>Auth:Req. ID</viewName>
-        <xPath>//samlp:AuthnRequest/@ID</xPath>
+        <xPath>/AuthnRequest/@ID</xPath>
     </attributes>
     <attributes>
             <name>Auth_ACS_Index</name>
             <valueType>String</valueType>
             <viewName>Auth:ACS Index</viewName>
-            <xPath>//samlp:AuthnRequest/@AttributeConsumingServiceIndex</xPath>
+            <xPath>/AuthnRequest/@AttributeConsumingServiceIndex</xPath>
     </attributes>
     <attributes>
             <name>Auth_Req_IssueInstant</name>
             <valueType>TimeStamp</valueType>
             <viewName>Auth:Req. IssueInstant</viewName>
-            <xPath>//samlp:AuthnRequest/@IssueInstant</xPath>
+            <xPath>/AuthnRequest/@IssueInstant</xPath>
     </attributes>
     <attributes>
             <name>Auth_Req_ProtocolBinding</name>
             <valueType>String</valueType>
             <viewName>Auth:Req. ProtocolBinding</viewName>
-            <xPath>//samlp:AuthnRequest/@ProtocolBinding</xPath>
+            <xPath>/AuthnRequest/@ProtocolBinding</xPath>
     </attributes>
     <attributes>
             <name>Auth_Req_Version</name>
             <valueType>String</valueType>
             <viewName>Auth:Req. Version</viewName>
-            <xPath>//samlp:AuthnRequest/@Version</xPath>
+            <xPath>/AuthnRequest/@Version</xPath>
     </attributes>
     <attributes>
             <name>Auth_Issuer</name>
             <valueType>String</valueType>
             <viewName>Auth:Issuer</viewName>
-            <xPath>//samlp:AuthnRequest/samlp:Issuer</xPath>
+            <xPath>/AuthnRequest/Issuer</xPath>
     </attributes>
 
     <attributes>
             <name>Resp_ID</name>
             <valueType>String</valueType>
             <viewName>Resp:ID</viewName>
-            <xPath>/saml2p:Response/@ID</xPath>
-    </attributes>
-    <attributes>
-            <name>Resp_ID</name>
-            <valueType>String</valueType>
-            <viewName>Resp:ID</viewName>
-            <xPath>/saml2p:Response/@ID</xPath>
+            <xPath>/Response/@ID</xPath>
     </attributes>
     <attributes>
         <name>Resp_StatusCode</name>
         <valueType>String</valueType>
         <viewName>Resp:Status Code</viewName>
-        <xPath>/saml2p:Response/saml2p:Status/saml2p:StatusCode/@Value</xPath>
+        <xPath>/Response/Status/StatusCode/@Value</xPath>
     </attributes>
     <attributes>
         <name>Resp_Assertion_ID</name>
         <valueType>String</valueType>
         <viewName>Resp:Assertion ID</viewName>
-        <xPath>/saml2p:Response/saml2:Assertion/@ID</xPath>
+        <xPath>/Response/Assertion/@ID</xPath>
     </attributes>
     <attributes>
         <name>Resp_Assertion_Version</name>
         <valueType>String</valueType>
         <viewName>Resp:Assertion Ver.</viewName>
-        <xPath>/saml2p:Response/saml2:Assertion/@Version</xPath>
+        <xPath>/Response/Assertion/@Version</xPath>
     </attributes>
     <attributes>
         <name>Resp_Issuer</name>
         <valueType>String</valueType>
         <viewName>Resp:Issuer</viewName>
-        <xPath>/saml2p:Response/saml2:Assertion/saml2:Issuer</xPath>
-    </attributes>
-    <attributes>
-        <name>Resp_Issuer</name>
-        <valueType>String</valueType>
-        <viewName>Resp:Issuer</viewName>
-        <xPath>/saml2p:Response/saml2:Assertion/saml2:Issuer</xPath>
+        <xPath>/Response/Assertion/Issuer</xPath>
     </attributes>
     <attributes>
         <name>Resp_Subject_NameID</name>
         <valueType>String</valueType>
         <viewName>Resp:Subject_NameID</viewName>
-        <xPath>/saml2p:Response/saml2:Assertion/saml2:Subject/saml2:NameID</xPath>
+        <xPath>/Response/Assertion/Subject/NameID</xPath>
     </attributes>
 </ns2:attributeSet>
