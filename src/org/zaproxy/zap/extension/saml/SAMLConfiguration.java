@@ -4,6 +4,7 @@ import org.parosproxy.paros.model.Model;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.Set;
@@ -54,6 +55,34 @@ public class SAMLConfiguration {
         return configData.getAutoChangeValues();
     }
 
+    public boolean getAutoChangeEnabled(){
+        return configData.isAutoChangerEnabled();
+    }
+
+    public void setAutochangeEnabled(boolean value){
+        configData.setAutoChangerEnabled(value);
+    }
+
+    public boolean getXSWEnabled(){
+        return configData.isXswEnabled();
+    }
+
+    public void setXSWEnabled(boolean value){
+        configData.setXswEnabled(value);
+    }
+
+    public void saveConfiguration(){
+        try {
+            JAXBContext context = JAXBContext.newInstance(SAMLConfigData.class);
+            Marshaller marshaller = context.createMarshaller();
+            String confPath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" +
+                    SAML_CONF_FILE;
+            marshaller.marshal(configData,new File(confPath));
+        } catch (JAXBException e) {
+
+        }
+    }
+
     /**
      * Unmarshall the XML file and extract the object using JAXB
      * @param clazz class of the object
@@ -70,4 +99,6 @@ public class SAMLConfiguration {
             throw new SAMLException("XML loading failed",e);
         }
     }
+
+
 }

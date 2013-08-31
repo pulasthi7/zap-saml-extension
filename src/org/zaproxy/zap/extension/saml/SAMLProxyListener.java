@@ -4,13 +4,15 @@ import org.apache.log4j.Logger;
 import org.parosproxy.paros.core.proxy.ProxyListener;
 import org.parosproxy.paros.network.HttpMessage;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 public class SAMLProxyListener implements ProxyListener {
 
     private boolean active;
-    private Properties autoChangeAttribs;
+    private Set<Attribute> autoChangeAttribs;
 
     protected static Logger log = Logger.getLogger(SAMLProxyListener.class.getName());
 
@@ -32,10 +34,10 @@ public class SAMLProxyListener implements ProxyListener {
                 SAMLMessage samlMessage = new SAMLMessage(message);
 
                 //change the params
-                for (Map.Entry<Object, Object> entry : autoChangeAttribs.entrySet()) {
+                for (Attribute attribute : autoChangeAttribs) {
                     //todo:for now, only the first value is taken into consideration, need to fix this
-                    String value = entry.getValue().toString().split(",")[0];
-                    samlMessage.changeAttributeValueTo(entry.getKey().toString(), value);
+                    String value = attribute.getValue().toString().split(",")[0];
+                    samlMessage.changeAttributeValueTo(attribute.getName(), value);
                 }
 
                 //change the original message
@@ -63,6 +65,10 @@ public class SAMLProxyListener implements ProxyListener {
     }
 
     public void loadAutoChangeAttributes() {
-        autoChangeAttribs = SAMLUtils.loadConfigurations();
+        try {
+            autoChangeAttribs = SAMLConfiguration.getConfiguration().getAutoChangeAttributes();
+        } catch (SAMLException e) {
+            autoChangeAttribs = new LinkedHashSet<>();
+        }
     }
 }

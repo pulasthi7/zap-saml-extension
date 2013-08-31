@@ -2,13 +2,13 @@ package org.zaproxy.zap.extension.saml;
 
 import org.apache.log4j.Logger;
 import org.parosproxy.paros.extension.encoder.Base64;
-import org.parosproxy.paros.model.Model;
 import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Properties;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -20,7 +20,6 @@ import java.util.zip.Inflater;
 public class SAMLUtils {
     private static final int MAX_INFLATED_SIZE = 5000;
     private static final String SAML_CONF_FILE_NAME = "saml.conf";
-    private static Properties samlAttributeNames;
 
     protected static Logger log = Logger.getLogger(SAMLUtils.class);
     /**
@@ -103,56 +102,31 @@ public class SAMLUtils {
     }
 
     /**
-     * Get the configuration for the ZAP SAML extension
-     * @return
+     * Check whether the httpMessage has a saml message in its parameters
+     * @param message The HttpMessage to be checked for
+     * @return whether the message has got a saml message within it
      */
-    public static Properties loadConfigurations() {
-
-        Properties config = new Properties();
-        try {
-            File savedPropertiesFile = new File(getSamlConfFileName());
-            if(savedPropertiesFile.exists()){
-                config.loadFromXML(new FileInputStream(savedPropertiesFile));
-            }
-        } catch (IOException e) {
-            log.warn("Error loading saved configurations, New configuration will be initiated");
-        }
-        return config;
-    }
-
-    public static void saveConfigurations(Properties p) throws SAMLException {
-        try {
-            p.storeToXML(new FileOutputStream(getSamlConfFileName()),"");
-        } catch (IOException e) {
-            throw new SAMLException("Couldn't save configuration",e);
-        }
-    }
-
-    public static String getSamlConfFileName(){
-        return Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" + SAML_CONF_FILE_NAME;
-    }
-
     public static boolean hasSAMLMessage(HttpMessage message){
         for (HtmlParameter parameter : message.getUrlParams()) {
-            if(parameter.getName().equals("SAMLRequest") && hasValue(parameter.getValue())){
+            if(parameter.getName().equals("SAMLRequest") && isNonEmptyValue(parameter.getValue())){
                 return true;
             }
-            if(parameter.getName().equals("SAMLResponse") && hasValue(parameter.getValue())){
+            if(parameter.getName().equals("SAMLResponse") && isNonEmptyValue(parameter.getValue())){
                 return true;
             }
         }
         for (HtmlParameter parameter : message.getFormParams()) {
-            if(parameter.getName().equals("SAMLRequest") && hasValue(parameter.getValue())){
+            if(parameter.getName().equals("SAMLRequest") && isNonEmptyValue(parameter.getValue())){
                 return true;
             }
-            if(parameter.getName().equals("SAMLResponse") && hasValue(parameter.getValue())){
+            if(parameter.getName().equals("SAMLResponse") && isNonEmptyValue(parameter.getValue())){
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean hasValue(String param){
+    private static boolean isNonEmptyValue(String param){
         if(param!=null){
             return !"".equals(param);
         }

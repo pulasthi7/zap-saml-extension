@@ -14,9 +14,6 @@ import java.util.*;
 public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListener {
 
     private JScrollPane attributeScrollPane;
-
-    private Properties configuration;
-
     private Set<Attribute> attributeSet;
 
 	/**
@@ -60,14 +57,11 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    configuration.clear();
-                    for (Attribute attribute : attributeSet) {
-                        configuration.put(attribute.getName(), attribute.getValue());
-                    }
-                    SAMLUtils.saveConfigurations(configuration);
+                    SAMLConfiguration.getConfiguration().getAutoChangeAttributes().clear();
+                    SAMLConfiguration.getConfiguration().getAutoChangeAttributes().addAll(attributeSet);
                     listener.loadAutoChangeAttributes();
                 } catch (SAMLException e1) {
-                    View.getSingleton().showWarningDialog("Save Failed");
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
         });
@@ -77,7 +71,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         btnResetChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                initConfigurations();
+                loadAutoChangeAttributes();
                 initAttributes();
             }
         });
@@ -91,31 +85,23 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             }
         });
 		footerPanel.add(btnExit);
-        initConfigurations();
+        loadAutoChangeAttributes();
         initAttributes();
 	}
 
-    private void initConfigurations() {
-        configuration = SAMLUtils.loadConfigurations();
+    private void loadAutoChangeAttributes(){
         attributeSet = new LinkedHashSet<>();
-        Map<String,Attribute> allAttributes = new LinkedHashMap<>();
         try {
-            for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes()) {
-                allAttributes.put(attribute.getName(),attribute);
-            }
-
-            for (Map.Entry<Object, Object> autoChangeAttribute : configuration.entrySet()) {
-                Attribute clonedAttribute = (Attribute) allAttributes.get(autoChangeAttribute.getKey()).clone();
+            for (Attribute autoChangeAttribute : SAMLConfiguration.getConfiguration().getAutoChangeAttributes()) {
+                Attribute clonedAttribute = (Attribute)autoChangeAttribute.clone();
                 clonedAttribute.setValue(autoChangeAttribute.getValue());
                 attributeSet.add(clonedAttribute);
             }
         } catch (SAMLException e) {
-
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
-
     }
 
     private void initAttributes(){
