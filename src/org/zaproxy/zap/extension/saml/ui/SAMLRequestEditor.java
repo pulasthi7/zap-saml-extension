@@ -149,10 +149,12 @@ public class SAMLRequestEditor {
      * Initialize the SAML attributes (label, value pairs)
      */
     private void initSAMLAttributes() {
-        JPanel attribPanel = new JPanel();
-        attribPanel.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
         Map<String, Attribute> samlAttributes;
         samlAttributes = samlMessage.getAttributeMap();
+
+        JPanel attribPanel = new JPanel();
+        attribPanel.setLayout(new java.awt.GridLayout(Math.max(15,samlAttributes.size()), 1, 5, 5));
+
         for (final Attribute attribute : samlAttributes.values()) {
             JSplitPane sPane = new JSplitPane();
             JLabel lbl = new JLabel();

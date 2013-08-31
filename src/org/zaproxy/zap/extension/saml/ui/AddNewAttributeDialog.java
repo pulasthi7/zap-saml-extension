@@ -9,29 +9,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AddNewAttribute extends JDialog {
+public class AddNewAttributeDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
     private JComboBox<Attribute> comboBoxAttribSelect;
-    private JTextArea textAreaAttribValues;
-
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		try {
-//			AddNewAttribute dialog = new AddNewAttribute();
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+    private JTextField txtAttribValues;
 
 	/**
 	 * Create the dialog.
 	 */
-	public AddNewAttribute(final DesiredAttributeChangeListener listener) {
+	public AddNewAttributeDialog(final DesiredAttributeChangeListener listener) {
         setTitle("Add New Attribute");
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -73,8 +60,8 @@ public class AddNewAttribute extends JDialog {
 				JScrollPane scrollPaneAttribValues = new JScrollPane();
 				attribValuesPanel.add(scrollPaneAttribValues, BorderLayout.CENTER);
 				{
-					textAreaAttribValues = new JTextArea();
-                    scrollPaneAttribValues.setViewportView(textAreaAttribValues);
+					txtAttribValues = new JTextField();
+                    scrollPaneAttribValues.setViewportView(txtAttribValues);
 				}
 			}
 		}
@@ -92,23 +79,15 @@ public class AddNewAttribute extends JDialog {
                                     "please select one from combo box");
                             return;
                         }
-                        String[] values = textAreaAttribValues.getText().split("\n");
-                        if(values.length==0){
-                            JOptionPane.showMessageDialog(AddNewAttribute.this,"No values given, " +
-                                    "Please provide values, one per line","Error in values",JOptionPane.OK_OPTION);
+                        if(txtAttribValues.getText().equals("")){
+                            JOptionPane.showMessageDialog(AddNewAttributeDialog.this,"No values given, " +
+                                    "Please provide a non-empty value","Error in value", JOptionPane.OK_OPTION);
                             return;
                         }
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (int i = 0; i < values.length; i++) {
-                            if(i!=0){
-                                stringBuilder.append(",");
-                            }
-                            stringBuilder.append(values[i]);
-                        }
                         Attribute attribute = ((Attribute)comboBoxAttribSelect.getSelectedItem());
-                        attribute.setValue(stringBuilder.toString());
+                        attribute.setValue(txtAttribValues.getText());
                         listener.onDesiredAttributeValueChange(attribute);
-                        AddNewAttribute.this.setVisible(false);
+                        AddNewAttributeDialog.this.setVisible(false);
                     }
                 });
 				buttonPane.add(okButton);
@@ -119,7 +98,7 @@ public class AddNewAttribute extends JDialog {
 				cancelButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        AddNewAttribute.this.setVisible(false);
+                        AddNewAttributeDialog.this.setVisible(false);
                     }
                 });
 				buttonPane.add(cancelButton);
@@ -131,8 +110,8 @@ public class AddNewAttribute extends JDialog {
         return comboBoxAttribSelect;
     }
 
-    public JTextArea getTextAreaAttribValues() {
-        return textAreaAttribValues;
+    public JTextField getTxtAttribValues() {
+        return txtAttribValues;
     }
 
 

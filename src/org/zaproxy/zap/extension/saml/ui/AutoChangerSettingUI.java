@@ -1,6 +1,5 @@
 package org.zaproxy.zap.extension.saml.ui;
 
-import org.parosproxy.paros.view.View;
 import org.zaproxy.zap.extension.saml.*;
 
 import javax.swing.*;
@@ -9,7 +8,8 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListener {
 
@@ -45,7 +45,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AddNewAttribute dialog = new AddNewAttribute(AutoChangerSettingUI.this);
+                AddNewAttributeDialog dialog = new AddNewAttributeDialog(AutoChangerSettingUI.this);
                 dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                 dialog.setVisible(true);
             }
@@ -60,6 +60,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
                     SAMLConfiguration.getConfiguration().getAutoChangeAttributes().clear();
                     SAMLConfiguration.getConfiguration().getAutoChangeAttributes().addAll(attributeSet);
                     listener.loadAutoChangeAttributes();
+                    SAMLConfiguration.getConfiguration().saveConfiguration();
                 } catch (SAMLException e1) {
                     e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
@@ -137,10 +138,10 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             btnAddeditValues.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    AddNewAttribute editDialog = new AddNewAttribute(AutoChangerSettingUI.this);
+                    AddNewAttributeDialog editDialog = new AddNewAttributeDialog(AutoChangerSettingUI.this);
                     editDialog.getComboBoxAttribSelect().removeAllItems();
                     editDialog.getComboBoxAttribSelect().addItem(attribute);
-                    editDialog.getTextAreaAttribValues().setText(attribute.getValue().toString().replaceAll(",", "\n"));
+                    editDialog.getTxtAttribValues().setText(attribute.getValue().toString().replaceAll(",", "\n"));
                     editDialog.setVisible(true);
                 }
             });

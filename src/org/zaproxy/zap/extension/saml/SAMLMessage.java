@@ -11,12 +11,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.*;
 import java.io.IOException;
 import java.io.StringReader;
@@ -262,6 +260,8 @@ public class SAMLMessage {
             if(newValue!=null){
                 attribute.setValue(newValue);
                 messageChanged = true;
+                updateXMLDocument();
+                updateMessage();
                 return true;
             }
         }
@@ -292,6 +292,7 @@ public class SAMLMessage {
                 processHTTPMessage();
                 buildXMLDocument();
                 buildAttributeMap();
+                messageChanged = false;
             } catch (SAMLException e) {
 
             }
@@ -303,18 +304,44 @@ public class SAMLMessage {
     }
 
     public void setRelayState(String relayState) {
-        this.relayState = relayState;
+        if(!this.relayState.equals(relayState)){
+            this.relayState = relayState;
+            messageChanged = true;
+        }
     }
 
     public String getSamlMessageString() {
-        //todo output formatted message
-        return samlMessageString;
+        try {
+            Source xmlInput;
+            xmlInput = new StreamSource(new StringReader(samlMessageString));
+
+            StringWriter stringWriter = new StringWriter();
+            StreamResult xmlOutput = new StreamResult(stringWriter);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setAttribute("indent-number", 4);
+            Transformer transformer = transformerFactory.newTransformer();
+
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(xmlInput, xmlOutput);
+            return xmlOutput.getWriter().toString();
+        } catch (Exception e) {
+            return samlMessageString;
+        }
     }
 
     public void setSamlMessageString(String samlMessageString) {
-        //todo trim and remove \n, \r
-        //todo validate
-        this.samlMessageString = samlMessageString;
+        samlMessageString = samlMessageString.trim().replaceAll("\n","").replaceAll("\\s+"," ");
+        if(!this.samlMessageString.equals(samlMessageString)){
+            //todo validate
+            this.samlMessageString = samlMessageString;
+            try {
+                buildXMLDocument();
+                buildAttributeMap();
+                messageChanged = true;
+            } catch (SAMLException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
     }
 
     public Map<String, Attribute> getAttributeMap() {

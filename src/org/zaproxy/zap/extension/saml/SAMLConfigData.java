@@ -11,12 +11,8 @@ public class SAMLConfigData {
     private boolean autoChangerEnabled;
     private boolean xswEnabled;
 
-    @XmlElementWrapper(name = "AllAttributes")
-    @XmlElement(name = "Attribute")
-    private Set<Attribute> availableAttributes;
+   private Set<Attribute> availableAttributes;
 
-    @XmlElementWrapper(name = "AutoChangeAttributes")
-    @XmlElement(name = "Attribute")
     private Set<Attribute> autoChangeValues;
 
     public boolean isAutoChangerEnabled() {
@@ -27,6 +23,8 @@ public class SAMLConfigData {
         this.autoChangerEnabled = autoChangerEnabled;
     }
 
+    @XmlElementWrapper(name = "AllAttributes")
+    @XmlElement(name = "Attribute")
     public Set<Attribute> getAvailableAttributes() {
         if(availableAttributes==null){
             availableAttributes = new LinkedHashSet<>();
@@ -45,6 +43,8 @@ public class SAMLConfigData {
         return autoChangeValues;
     }
 
+    @XmlElementWrapper(name = "AutoChangeAttributes")
+    @XmlElement(name = "Attribute")
     public void setAutoChangeValues(Set<Attribute> autoChangeValues) {
         this.autoChangeValues = autoChangeValues;
     }

@@ -75,6 +75,7 @@ public class SAMLConfiguration {
         try {
             JAXBContext context = JAXBContext.newInstance(SAMLConfigData.class);
             Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             String confPath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" +
                     SAML_CONF_FILE;
             marshaller.marshal(configData,new File(confPath));

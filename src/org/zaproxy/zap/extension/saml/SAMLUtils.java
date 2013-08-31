@@ -19,7 +19,6 @@ import java.util.zip.Inflater;
  */
 public class SAMLUtils {
     private static final int MAX_INFLATED_SIZE = 5000;
-    private static final String SAML_CONF_FILE_NAME = "saml.conf";
 
     protected static Logger log = Logger.getLogger(SAMLUtils.class);
     /**
@@ -127,10 +126,7 @@ public class SAMLUtils {
     }
 
     private static boolean isNonEmptyValue(String param){
-        if(param!=null){
-            return !"".equals(param);
-        }
-        return false;
+        return param != null && !"".equals(param);
     }
 
     /**
