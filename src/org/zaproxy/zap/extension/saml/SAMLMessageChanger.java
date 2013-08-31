@@ -1,5 +1,6 @@
 package org.zaproxy.zap.extension.saml;
 
+import org.apache.commons.httpclient.URIException;
 import org.joda.time.DateTime;
 import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
@@ -21,6 +22,8 @@ import javax.xml.xpath.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,9 +83,6 @@ public class SAMLMessageChanger {
                 relayState = formParameter.getValue();
             }
         }
-
-
-
     }
 
     /**
@@ -152,6 +152,9 @@ public class SAMLMessageChanger {
         }
     }
 
+    /**
+     * Update XML document with any attributes that were changed
+     */
     private void updateXMLDocument(){
         XPathFactory xFactory = XPathFactory.newInstance();
         XPath xpath = xFactory.newXPath();
@@ -160,11 +163,14 @@ public class SAMLMessageChanger {
                 NodeList nodeList = (NodeList) xpath.compile(attribute.getxPath()).evaluate(xmlDocument, XPathConstants.NODESET);
                 nodeList.item(0).setNodeValue(attribute.getValue().toString());
             } catch (XPathExpressionException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+
             }
         }
     }
 
+    /**
+     * Update the saml message text to the changed xml document
+     */
     private void updateMessage(){
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -174,8 +180,60 @@ public class SAMLMessageChanger {
             transformer.transform(new DOMSource(xmlDocument), new StreamResult(writer));
             samlMessageString = writer.getBuffer().toString().replaceAll("\n|\r", "");
         } catch (TransformerException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+
         }
+    }
+
+    /**
+     * Rebuild the httpmessage with the changed saml message
+     */
+    private void rebuildHttpMessage() {
+        try {
+            String encodedSAMLMessage = SAMLUtils.b64Encode(SAMLUtils.deflateMessage(samlMessageString));
+            StringBuilder newParamBuilder = new StringBuilder();
+            int paramIndex = 0;
+
+            for (HtmlParameter urlParameter : httpMessage.getUrlParams()) {
+                if (urlParameter.getName().equals("SAMLRequest") || urlParameter.getName().equals("SAMLResponse")) {
+                    String samlParam = urlParameter.getName();
+                    newParamBuilder.append(samlParam + "=" + URLEncoder.encode(encodedSAMLMessage, "UTF-8"));
+                }else if(urlParameter.getName().equals("RelayState")){
+                    newParamBuilder.append("RelayState="+URLEncoder.encode(relayState,"UTF-8"));
+                } else{
+                    newParamBuilder.append(urlParameter.getName() + "=" + URLEncoder.encode(urlParameter.getValue(), "UTF-8"));
+                }
+                if (paramIndex < httpMessage.getUrlParams().size() - 1) {
+                    newParamBuilder.append("&");  //add '&' between params for separation
+                }
+                paramIndex++;
+            }
+            httpMessage.getRequestHeader().getURI().setEscapedQuery(newParamBuilder.toString());
+
+            newParamBuilder = new StringBuilder();
+            paramIndex = 0;
+            for (HtmlParameter formParameter : httpMessage.getFormParams()) {
+                if (formParameter.getName().equals("SAMLRequest") || formParameter.getName().equals("SAMLResponse")) {
+                    String samlParam = formParameter.getName();
+                    newParamBuilder.append(samlParam + "=" + URLEncoder.encode(encodedSAMLMessage, "UTF-8"));
+                }else if(formParameter.getName().equals("RelayState")){
+                    newParamBuilder.append("RelayState="+URLEncoder.encode(relayState,"UTF-8"));
+                } else{
+                    newParamBuilder.append(formParameter.getName()+"="+URLEncoder.encode(formParameter.getValue(),"UTF-8"));
+                }
+                if (paramIndex < httpMessage.getUrlParams().size() - 1) {
+                    newParamBuilder.append("&");  //add '&' between params for separation
+                }
+                paramIndex++;
+            }
+            httpMessage.setRequestBody(newParamBuilder.toString());
+        } catch (UnsupportedEncodingException e) {
+
+        } catch (URIException e) {
+
+        } catch (SAMLException e) {
+
+        }
+        messageChanged =false;  //the message is permanently modified, can't revert from here on
     }
 
     /**
@@ -197,13 +255,60 @@ public class SAMLMessageChanger {
         return false;
     }
 
+    /**
+     * Get the new HTTPmessage with changed parameters
+     * @return
+     */
     public HttpMessage getChangedMessege(){
         if(!messageChanged){
             return httpMessage;
         }else{
-            //build the new message
+            updateXMLDocument();
+            updateMessage();
+            rebuildHttpMessage();
         }
         return httpMessage;
     }
 
+    /**
+     * Reset any changes to the http message
+     */
+    public void resetChanges(){
+        if(messageChanged){
+            try {
+                processHTTPMessage();
+                buildXMLDocument();
+                buildAttributeMap();
+            } catch (SAMLException e) {
+
+            }
+        }
+    }
+
+    public String getRelayState() {
+        return relayState;
+    }
+
+    public void setRelayState(String relayState) {
+        this.relayState = relayState;
+    }
+
+    public String getSamlMessageString() {
+        //todo output formatted message
+        return samlMessageString;
+    }
+
+    public void setSamlMessageString(String samlMessageString) {
+        //todo trim and remove \n, \r
+        //todo validate
+        this.samlMessageString = samlMessageString;
+    }
+
+    public Map<String, Attribute> getAttributeMap() {
+        return attributeMap;
+    }
+
+    public void setAttributeMap(Map<String, Attribute> attributeMap) {
+        this.attributeMap = attributeMap;
+    }
 }

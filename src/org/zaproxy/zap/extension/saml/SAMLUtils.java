@@ -1,25 +1,16 @@
 package org.zaproxy.zap.extension.saml;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 import org.parosproxy.paros.extension.encoder.Base64;
 import org.parosproxy.paros.model.Model;
 import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -141,57 +132,6 @@ public class SAMLUtils {
 
     public static String getSamlConfFileName(){
         return Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" + SAML_CONF_FILE_NAME;
-    }
-
-    public static Set<String> getSAMLAttributes(){
-        Set<String> allAttibutes = new HashSet<>();
-        allAttibutes.add("AuthnRequest[ID]");
-        allAttibutes.add("AuthnRequest[AssertionConsumerServiceURL]");
-        allAttibutes.add("AuthnRequest[AttributeConsumingServiceIndex]");
-        allAttibutes.add("AuthnRequest[IssueInstant]");
-        allAttibutes.add("AuthnRequest[ProtocolBinding]");
-        allAttibutes.add("AuthnRequest[Version]");
-        allAttibutes.add("AuthnRequest:Issuer");
-        allAttibutes.add("AuthnRequest:NameIDPolicy[Format]");
-        allAttibutes.add("AuthnRequest:NameIDPolicy[SPNameQualifier]");
-        allAttibutes.add("AuthnRequest:NameIDPolicy[AllowCreate]");
-        allAttibutes.add("AuthnRequest:RequestedAuthnContext[Comparison]");
-        allAttibutes.add("AuthnRequest:RequestedAuthnContext:AuthnContextClassRef");
-
-        allAttibutes.add("Assertion[ID]");
-        allAttibutes.add("Assertion[IssueInstant]");
-        allAttibutes.add("Assertion[Version]");
-        allAttibutes.add("Assertion:Issuer");
-        allAttibutes.add("Assertion:Issuer[Format]");
-        allAttibutes.add("Assertion:Subject:NameID");
-        allAttibutes.add("Assertion:Subject:SubjectConfirmation[Method]");
-        allAttibutes.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[InResponseTo]");
-        allAttibutes.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[Recipient]");
-        allAttibutes.add("Assertion:Subject:SubjectConfirmation:SubjectConfirmationData[NotOnOrAfter]");
-        allAttibutes.add("Assertion:Conditions[NotOnOrAfter]");
-        allAttibutes.add("Assertion:Conditions[NotBefore]");
-        allAttibutes.add("Assertion:Conditions:AudienceRestriction:Audience");
-        allAttibutes.add("Assertion:AuthnStatement[AuthnInstant]");
-        allAttibutes.add("Assertion:AuthnStatement[SessionIndex]");
-        allAttibutes.add("Assertion:AuthnStatement:AuthnContext:AuthnContextClassRef");
-
-        return allAttibutes;
-    }
-
-    public static String getAttributeViewValue(String attibuteName){
-        if(samlAttributeNames==null){
-            try {
-                samlAttributeNames = new Properties();
-                samlAttributeNames.load(SAMLUtils.class.getResourceAsStream("attributes.properties"));
-            } catch (IOException e) {
-                log.error("Error loading attributes.properties file");
-                return "";
-            }
-        }
-        if(samlAttributeNames.containsKey(attibuteName)){
-            return samlAttributeNames.get(attibuteName).toString();
-        }
-        return "";
     }
 
     public static boolean hasSAMLMessage(HttpMessage message){

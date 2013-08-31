@@ -59,4 +59,19 @@ public class Attribute {
     public void setValue(Object value) {
         this.value = value;
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Attribute clone = new Attribute();
+        clone.setxPath(xPath);
+        clone.setName(name);
+        clone.setValueType(valueType);
+        clone.setViewName(viewName);
+        return clone;
+    }
+
+    @Override
+    public String toString() {
+        return viewName;
+    }
 }

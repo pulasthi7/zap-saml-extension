@@ -1,6 +1,7 @@
-package org.zaproxy.zap.extension.saml;
+package org.zaproxy.zap.extension.saml.ui;
 
 import org.parosproxy.paros.view.View;
+import org.zaproxy.zap.extension.saml.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,7 +12,7 @@ import java.awt.event.ActionListener;
 public class AddNewAttribute extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-    private JComboBox<String> comboBoxAttribSelect;
+    private JComboBox<Attribute> comboBoxAttribSelect;
     private JTextArea textAreaAttribValues;
 
 //	/**
@@ -46,10 +47,14 @@ public class AddNewAttribute extends JDialog {
 			{
                 attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
 				comboBoxAttribSelect = new JComboBox<>();
-                for (String attribute : SAMLUtils.getSAMLAttributes()) {
-                    if(!listener.getDesiredAttributes().contains(attribute)){
-                        comboBoxAttribSelect.addItem(SAMLUtils.getAttributeViewValue(attribute));
+                try {
+                    for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes().getAttributes()) {
+                        if(!listener.getDesiredAttributes().contains(attribute.getName())){
+                            comboBoxAttribSelect.addItem(attribute);
+                        }
                     }
+                } catch (SAMLException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 comboBoxAttribSelect.setMaximumRowCount(5);
 				attribNamePanel.add(comboBoxAttribSelect);
@@ -89,8 +94,8 @@ public class AddNewAttribute extends JDialog {
                         }
                         String[] values = textAreaAttribValues.getText().split("\n");
                         if(values.length==0){
-                            View.getSingleton().showWarningDialog("No values given, " +
-                                    "please provide values, one per line");
+                            JOptionPane.showMessageDialog(AddNewAttribute.this,"No values given, " +
+                                    "Please provide values, one per line","Error in values",JOptionPane.OK_OPTION);
                             return;
                         }
                         StringBuilder stringBuilder = new StringBuilder();
@@ -100,13 +105,9 @@ public class AddNewAttribute extends JDialog {
                             }
                             stringBuilder.append(values[i]);
                         }
-                        String attribute = comboBoxAttribSelect.getSelectedItem().toString();
-                        for (String s : SAMLUtils.getSAMLAttributes()) {
-                            if(SAMLUtils.getAttributeViewValue(s).equals(attribute)){
-                                listener.onAddDesiredAttribute(s,stringBuilder.toString());
-                                break;
-                            }
-                        }
+                        Attribute attribute = ((Attribute)comboBoxAttribSelect.getSelectedItem());
+                        attribute.setValue(stringBuilder.toString());
+                        listener.onDesiredAttributeValueChange(attribute);
                         AddNewAttribute.this.setVisible(false);
                     }
                 });
@@ -126,7 +127,7 @@ public class AddNewAttribute extends JDialog {
 		}
 	}
 
-    public JComboBox<String> getComboBoxAttribSelect() {
+    public JComboBox<Attribute> getComboBoxAttribSelect() {
         return comboBoxAttribSelect;
     }
 

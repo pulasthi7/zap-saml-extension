@@ -1,6 +1,7 @@
-package org.zaproxy.zap.extension.saml;
+package org.zaproxy.zap.extension.saml.ui;
 
 import org.parosproxy.paros.view.View;
+import org.zaproxy.zap.extension.saml.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,10 +9,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListener {
 
@@ -19,7 +17,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 
     private Properties configuration;
 
-    private Map<String,String> valueMap;
+    private Set<Attribute> attributeSet;
 
 	/**
 	 * Create the frame.
@@ -63,8 +61,8 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             public void actionPerformed(ActionEvent e) {
                 try {
                     configuration.clear();
-                    for (Map.Entry<String, String> conf : valueMap.entrySet()) {
-                        configuration.put(conf.getKey(),conf.getValue());
+                    for (Attribute attribute : attributeSet) {
+                        configuration.put(attribute.getName(), attribute.getValue());
                     }
                     SAMLUtils.saveConfigurations(configuration);
                     listener.loadAutoChangeAttributes();
@@ -99,17 +97,31 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 
     private void initConfigurations() {
         configuration = SAMLUtils.loadConfigurations();
-        valueMap = new LinkedHashMap<>();
+        attributeSet = new LinkedHashSet<>();
+        Map<String,Attribute> allAttributes = new LinkedHashMap<>();
+        try {
+            for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes().getAttributes()) {
+                allAttributes.put(attribute.getName(),attribute);
+            }
 
-        for (Map.Entry<Object, Object> attribute : configuration.entrySet()) {
-            valueMap.put(attribute.getKey().toString(),attribute.getValue().toString());
+            for (Map.Entry<Object, Object> autoChangeAttribute : configuration.entrySet()) {
+                Attribute clonedAttribute = (Attribute) allAttributes.get(autoChangeAttribute.getKey()).clone();
+                clonedAttribute.setValue(autoChangeAttribute.getValue());
+                attributeSet.add(clonedAttribute);
+            }
+        } catch (SAMLException e) {
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+
+
     }
 
     private void initAttributes(){
         JPanel attributePanel = new JPanel();
         attributeScrollPane.setViewportView(attributePanel);
-        attributePanel.setLayout(new GridLayout(Math.max(valueMap.size()+1,15), 1, 5, 0));
+        attributePanel.setLayout(new GridLayout(Math.max(attributeSet.size()+1,15), 1, 5, 0));
         attributePanel.setBorder(new TitledBorder("SAML Attributes to be changed automatically"));
         JPanel panel = new JPanel();
         attributePanel.add(panel);
@@ -117,12 +129,12 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         JLabel lblHeader = new JLabel("<html><p>Following attributes will be changed to the given values " +
                 "automatically. Add/Edit the attributes and values below </p></html>");
         panel.add(lblHeader);
-        for (final Map.Entry<String, String> entry : valueMap.entrySet()) {
+        for (final Attribute attribute : attributeSet) {
             panel = new JPanel();
             attributePanel.add(panel);
             panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-            final JLabel lblAttribute = new JLabel(SAMLUtils.getAttributeViewValue(entry.getKey()));
+            final JLabel lblAttribute = new JLabel(attribute.getViewName());
             Dimension size = lblAttribute.getPreferredSize();
             size.width = 200;
             lblAttribute.setMinimumSize(size);
@@ -131,7 +143,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 
             JTextField txtValue = new JTextField();
             lblAttribute.setLabelFor(txtValue);
-            txtValue.setText(entry.getValue());
+            txtValue.setText(attribute.getValue().toString());
             panel.add(txtValue);
             txtValue.setColumns(20);
 
@@ -141,8 +153,8 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
                 public void actionPerformed(ActionEvent e) {
                     AddNewAttribute editDialog = new AddNewAttribute(AutoChangerSettingUI.this);
                     editDialog.getComboBoxAttribSelect().removeAllItems();
-                    editDialog.getComboBoxAttribSelect().addItem(lblAttribute.getText());
-                    editDialog.getTextAreaAttribValues().setText(entry.getValue().replaceAll(",","\n"));
+                    editDialog.getComboBoxAttribSelect().addItem(attribute);
+                    editDialog.getTextAreaAttribValues().setText(attribute.getValue().toString().replaceAll(",", "\n"));
                     editDialog.setVisible(true);
                 }
             });
@@ -155,7 +167,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
                     int response = JOptionPane.showConfirmDialog(AutoChangerSettingUI.this,
                             "Are you sure to remove the attribute","Confirm",JOptionPane.YES_NO_OPTION);
                     if(response == JOptionPane.YES_OPTION){
-                        onDeleteDesiredAttribute(entry.getKey());
+                        onDeleteDesiredAttribute(attribute);
                     }
                 }
             });
@@ -165,27 +177,25 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
     }
 
     @Override
-    public void onDesiredAttributeValueChange(String attribute, String value) {
-        onAddDesiredAttribute(attribute,value);
+    public void onDesiredAttributeValueChange(Attribute attribute) {
+        onAddDesiredAttribute(attribute);
         initAttributes();
     }
 
     @Override
-    public void onAddDesiredAttribute(String attribute, String values) {
-        valueMap.put(attribute,values);
+    public void onAddDesiredAttribute(Attribute attribute) {
+        attributeSet.add(attribute);
         initAttributes();
     }
 
     @Override
-    public void onDeleteDesiredAttribute(String attribute) {
-        if(valueMap.containsKey(attribute)){
-            valueMap.remove(attribute);
-            initAttributes();
-        }
+    public void onDeleteDesiredAttribute(Attribute attribute) {
+        attributeSet.remove(attribute);
+        initAttributes();
     }
 
     @Override
-    public Set<String> getDesiredAttributes() {
-        return valueMap.keySet();
+    public Set<Attribute> getDesiredAttributes() {
+        return attributeSet;
     }
 }

@@ -29,49 +29,26 @@ public class SAMLProxyListener implements ProxyListener {
     @Override
     public boolean onHttpRequestSend(HttpMessage message) {
         if (active && SAMLUtils.hasSAMLMessage(message)) {
-            String samlParameter = null;
-            SAMLMessage samlMessage = null;
-            Binding binding = null;
-
-            //search the url parameters for saml message
-            for (HtmlParameter parameter : message.getUrlParams()) {
-                if ("SAMLRequest".equals(parameter.getName()) || "SAMLResponse".equals(parameter.getName())) {
-                    samlParameter = parameter.getName();
-                    binding = Binding.HTTPRedirect;
-                    samlMessage = new SAMLMessage(SAMLUtils.extractSAMLMessage(parameter.getValue(), binding));
-                    break;
-                }
-            }
-
-            //search the post parameters for saml message
-            for (HtmlParameter parameter : message.getFormParams()) {
-                if ("SAMLRequest".equals(parameter.getName()) || "SAMLResponse".equals(parameter.getName())) {
-                    samlParameter = parameter.getName();
-                    binding = Binding.HTTPPost;
-                    samlMessage = new SAMLMessage(SAMLUtils.extractSAMLMessage(parameter.getValue(), binding));
-                    break;
-                }
-            }
-
-            //change the parameters
-            for (Map.Entry<Object, Object> entry : autoChangeAttribs.entrySet()) {
-                //todo:for now, only the first value is taken into consideration, need to fix this
-                String value = entry.getValue().toString().split(",")[0];
-                try {
-                    samlMessage.setValueTo(entry.getKey().toString(), value);
-                } catch (SAMLException e) {
-                    //Exception can be ignored, as the message may not contain the attribute
-                    log.debug("Value " + value + " could not be set for " + entry.getKey());
-                }
-            }
-
-            //rebuild the message
             try {
-                SAMLResender.buildSAMLRequest(message, samlParameter, samlMessage.getPrettyFormattedMessage(), binding);
-            } catch (SAMLException e) {
-                log.error("SAML Attribute change process failed." + e.getMessage());
-            }
+                SAMLMessageChanger samlMessage = new SAMLMessageChanger(message);
 
+                //change the params
+                for (Map.Entry<Object, Object> entry : autoChangeAttribs.entrySet()) {
+                    //todo:for now, only the first value is taken into consideration, need to fix this
+                    String value = entry.getValue().toString().split(",")[0];
+                    samlMessage.changeAttributeValueTo(entry.getKey().toString(), value);
+                }
+
+                //change the original message
+                HttpMessage changedMessege = samlMessage.getChangedMessege();
+                if(changedMessege!=message){
+                    //check for reference, if they are same the message is already changed,
+                    // else the header and body are changed
+                    message.setRequestBody(changedMessege.getRequestBody());
+                    message.setRequestHeader(changedMessege.getRequestHeader());
+                }
+            } catch (SAMLException e) {
+            }
         }
         return true;
     }

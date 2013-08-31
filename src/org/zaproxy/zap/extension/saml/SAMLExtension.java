@@ -1,16 +1,11 @@
 package org.zaproxy.zap.extension.saml;
 
 import org.parosproxy.paros.Constant;
-import org.parosproxy.paros.control.Control;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
 import org.parosproxy.paros.extension.ExtensionPopupMenuItem;
-import org.parosproxy.paros.extension.SessionChangedListener;
-import org.parosproxy.paros.extension.manualrequest.ManualRequestEditorDialog;
-import org.parosproxy.paros.extension.manualrequest.http.impl.ManualHttpRequestEditorDialog;
-import org.parosproxy.paros.model.HistoryReference;
-import org.parosproxy.paros.model.Session;
 import org.zaproxy.zap.extension.ExtensionPopupMenu;
+import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingUI;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -37,6 +32,12 @@ public class SAMLExtension extends ExtensionAdaptor {
     @Override
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
+
+        try {
+            SAMLConfiguration conf = SAMLConfiguration.getConfiguration();
+        } catch (SAMLException e) {
+
+        }
 
         if (getView() != null) {
 

@@ -1,8 +1,8 @@
 package org.zaproxy.zap.extension.saml;
 
-import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.view.View;
+import org.zaproxy.zap.extension.saml.ui.SAMLRequestEditor;
 import org.zaproxy.zap.view.PopupMenuHttpMessage;
 
 public class SAMLResendMenuItem extends PopupMenuHttpMessage {
