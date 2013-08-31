@@ -1,15 +1,12 @@
 package org.zaproxy.zap.extension.saml;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @XmlRootElement(namespace = "org.zaproxy.zap.extension.saml")
 public class AttributeSet {
-    @XmlElementWrapper
-    @XmlElement
+//    @XmlElementWrapper
     private Set<Attribute> attributes;
 
     public Set<Attribute> getAttributes() {
