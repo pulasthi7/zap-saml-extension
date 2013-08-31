@@ -1,16 +1,12 @@
 package org.zaproxy.zap.extension.saml;
 
 import org.parosproxy.paros.Constant;
-import org.parosproxy.paros.control.Control;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
 import org.parosproxy.paros.extension.ExtensionPopupMenuItem;
-import org.parosproxy.paros.extension.SessionChangedListener;
-import org.parosproxy.paros.extension.manualrequest.ManualRequestEditorDialog;
-import org.parosproxy.paros.extension.manualrequest.http.impl.ManualHttpRequestEditorDialog;
-import org.parosproxy.paros.model.HistoryReference;
-import org.parosproxy.paros.model.Session;
 import org.zaproxy.zap.extension.ExtensionPopupMenu;
+import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingFrame;
+import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -38,6 +34,12 @@ public class SAMLExtension extends ExtensionAdaptor {
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
 
+        try {
+            SAMLConfiguration conf = SAMLConfiguration.getConfiguration();
+        } catch (SAMLException e) {
+
+        }
+
         if (getView() != null) {
 
             final SAMLProxyListener proxyListener = new SAMLProxyListener();
@@ -53,7 +55,7 @@ public class SAMLExtension extends ExtensionAdaptor {
             samlActiveEditorMenu.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    AutoChangerSettingUI settingUI = new AutoChangerSettingUI(proxyListener);
+                    AutoChangerSettingFrame settingUI = new AutoChangerSettingFrame(proxyListener);
                     settingUI.setVisible(true);
                 }
             });
