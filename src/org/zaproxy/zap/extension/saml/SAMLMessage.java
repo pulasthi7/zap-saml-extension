@@ -4,8 +4,7 @@ import org.apache.commons.httpclient.URIException;
 import org.joda.time.DateTime;
 import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -24,6 +23,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,6 +44,7 @@ public class SAMLMessage {
     public SAMLMessage(HttpMessage httpMessage) throws SAMLException {
         this.httpMessage = httpMessage;
         messageChanged = false;
+        attributeMap = new LinkedHashMap<>();
         init();
     }
 
@@ -112,10 +113,22 @@ public class SAMLMessage {
         for (Attribute attribute : allAttributes) {
             try {
                 XPathExpression expression = xpath.compile(attribute.getxPath());
-                String value = expression.evaluate(xmlDocument);
-                Attribute newAttrib = (Attribute) attribute.clone();
-                newAttrib.setValue(value);
-                attributeMap.put(attribute.getName(),newAttrib);
+                Node node = (Node)expression.evaluate(xmlDocument,XPathConstants.NODE);
+                if(node!=null){     //the attributes that aren't available will be giving null values
+                    String value = "";
+                    if(node instanceof Element){
+                        value = ((Element)node).getTextContent();
+                    } else if(node instanceof Attr){
+                        value = ((Attr)node).getValue();
+                    } else {
+                        value = node.getNodeValue();
+                    }
+                    if(value!=null && !"".equals(value)){
+                        Attribute newAttrib = (Attribute) attribute.clone();
+                        newAttrib.setValue(value);
+                        attributeMap.put(attribute.getName(),newAttrib);
+                    }
+                }
             } catch (XPathExpressionException e) {
                 //can't be evaluated
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -220,7 +233,7 @@ public class SAMLMessage {
                 } else{
                     newParamBuilder.append(formParameter.getName()+"="+URLEncoder.encode(formParameter.getValue(),"UTF-8"));
                 }
-                if (paramIndex < httpMessage.getUrlParams().size() - 1) {
+                if (paramIndex < httpMessage.getFormParams().size() - 1) {
                     newParamBuilder.append("&");  //add '&' between params for separation
                 }
                 paramIndex++;
