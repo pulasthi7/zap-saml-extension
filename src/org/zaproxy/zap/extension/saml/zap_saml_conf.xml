@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:attributeSet xmlns:ns2="org.zaproxy.zap.extension.saml">
+<ns2:samlConfigData xmlns:ns2="org.zaproxy.zap.extension.saml">
     <AllAttributes>
         <Attribute>
             <name>Auth_ACS_URL</name>
@@ -81,4 +81,4 @@
             <xPath>/Response/Assertion/Subject/NameID</xPath>
         </Attribute>
     </AllAttributes>
-</ns2:attributeSet>
+</ns2:samlConfigData>
