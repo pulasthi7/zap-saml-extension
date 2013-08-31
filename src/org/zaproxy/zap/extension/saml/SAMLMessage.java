@@ -27,7 +27,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Set;
 
-public class SAMLMessageChanger {
+public class SAMLMessage {
 
     private boolean messageChanged;
     private HttpMessage httpMessage;
@@ -41,7 +41,7 @@ public class SAMLMessageChanger {
      * @param httpMessage
      * @throws SAMLException
      */
-    public SAMLMessageChanger(HttpMessage httpMessage) throws SAMLException {
+    public SAMLMessage(HttpMessage httpMessage) throws SAMLException {
         this.httpMessage = httpMessage;
         messageChanged = false;
         init();
