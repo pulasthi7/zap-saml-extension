@@ -11,7 +11,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Map;
 
-public class SAMLRequestEditor {
+public class SAMLManualRequestEditorFrame {
 
     //The UI components
     private JPanel samlEditorPanel;                     //the root panel of the Jframe
@@ -39,7 +39,7 @@ public class SAMLRequestEditor {
     //Other variables
     private SAMLMessage samlMessage;
 
-    public SAMLRequestEditor(HttpMessage message) {
+    public SAMLManualRequestEditorFrame(HttpMessage message) {
         try {
             samlMessage = new SAMLMessage(message);
         } catch (SAMLException e) {

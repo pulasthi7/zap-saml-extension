@@ -5,7 +5,8 @@ import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
 import org.parosproxy.paros.extension.ExtensionPopupMenuItem;
 import org.zaproxy.zap.extension.ExtensionPopupMenu;
-import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingUI;
+import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingFrame;
+import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -54,7 +55,7 @@ public class SAMLExtension extends ExtensionAdaptor {
             samlActiveEditorMenu.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    AutoChangerSettingUI settingUI = new AutoChangerSettingUI(proxyListener);
+                    AutoChangerSettingFrame settingUI = new AutoChangerSettingFrame(proxyListener);
                     settingUI.setVisible(true);
                 }
             });

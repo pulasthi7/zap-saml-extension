@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChangeListener {
+public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeChangeListener {
 
     private JScrollPane attributeScrollPane;
     private Set<Attribute> attributeSet;
@@ -19,7 +19,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
 	/**
 	 * Create the frame.
 	 */
-	public AutoChangerSettingUI(final SAMLProxyListener listener) {
+	public AutoChangerSettingFrame(final SAMLProxyListener listener) {
 		setTitle("SAML Automatic Request Changer Settings");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(800, 700);
@@ -45,7 +45,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AddNewAttributeDialog dialog = new AddNewAttributeDialog(AutoChangerSettingUI.this);
+                AddNewAttributeDialog dialog = new AddNewAttributeDialog(AutoChangerSettingFrame.this);
                 dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                 dialog.setVisible(true);
             }
@@ -82,7 +82,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AutoChangerSettingUI.this.setVisible(false);
+                AutoChangerSettingFrame.this.setVisible(false);
             }
         });
 		footerPanel.add(btnExit);
@@ -138,7 +138,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             btnAddeditValues.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    AddNewAttributeDialog editDialog = new AddNewAttributeDialog(AutoChangerSettingUI.this);
+                    AddNewAttributeDialog editDialog = new AddNewAttributeDialog(AutoChangerSettingFrame.this);
                     editDialog.getComboBoxAttribSelect().removeAllItems();
                     editDialog.getComboBoxAttribSelect().addItem(attribute);
                     editDialog.getTxtAttribValues().setText(attribute.getValue().toString().replaceAll(",", "\n"));
@@ -151,7 +151,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
             btnRemoveAttribute.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int response = JOptionPane.showConfirmDialog(AutoChangerSettingUI.this,
+                    int response = JOptionPane.showConfirmDialog(AutoChangerSettingFrame.this,
                             "Are you sure to remove the attribute","Confirm",JOptionPane.YES_NO_OPTION);
                     if(response == JOptionPane.YES_OPTION){
                         onDeleteDesiredAttribute(attribute);

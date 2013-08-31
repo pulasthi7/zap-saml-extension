@@ -2,7 +2,7 @@ package org.zaproxy.zap.extension.saml;
 
 import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.view.View;
-import org.zaproxy.zap.extension.saml.ui.SAMLRequestEditor;
+import org.zaproxy.zap.extension.saml.ui.SAMLManualRequestEditorFrame;
 import org.zaproxy.zap.view.PopupMenuHttpMessage;
 
 public class SAMLResendMenuItem extends PopupMenuHttpMessage {
@@ -17,7 +17,7 @@ public class SAMLResendMenuItem extends PopupMenuHttpMessage {
             View.getSingleton().showWarningDialog("Not a valid SAML request");
             return;
         }
-        SAMLRequestEditor editor = new SAMLRequestEditor(httpMessage);
+        SAMLManualRequestEditorFrame editor = new SAMLManualRequestEditorFrame(httpMessage);
         editor.showUI();
     }
 
