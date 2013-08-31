@@ -37,10 +37,12 @@ public class AddNewAttributeDialog extends JDialog {
                 try {
                     for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes()) {
                         if(!listener.getDesiredAttributes().contains(attribute.getName())){
-                            comboBoxAttribSelect.addItem(attribute);
+                            comboBoxAttribSelect.addItem((Attribute) attribute.clone());
                         }
                     }
                 } catch (SAMLException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (CloneNotSupportedException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 comboBoxAttribSelect.setMaximumRowCount(5);
@@ -57,11 +59,9 @@ public class AddNewAttributeDialog extends JDialog {
 				attribValuesPanel.add(lblAttributeValues, BorderLayout.NORTH);
 			}
 			{
-				JScrollPane scrollPaneAttribValues = new JScrollPane();
-				attribValuesPanel.add(scrollPaneAttribValues, BorderLayout.CENTER);
 				{
 					txtAttribValues = new JTextField();
-                    scrollPaneAttribValues.setViewportView(txtAttribValues);
+                    attribValuesPanel.add(txtAttribValues, BorderLayout.CENTER);
 				}
 			}
 		}
