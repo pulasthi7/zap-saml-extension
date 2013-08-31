@@ -1,4 +1,7 @@
-package org.zaproxy.zap.extension.saml;
+package org.zaproxy.zap.extension.saml.ui;
+
+import org.zaproxy.zap.extension.saml.Attribute;
+import org.zaproxy.zap.extension.saml.DesiredAttributeChangeListener;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -34,8 +37,8 @@ public class ChangeAttribValueDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public ChangeAttribValueDialog(final DesiredAttributeChangeListener listener, final String attribute, final String currentValues) {
-		setTitle("Add/Edit values for "+attribute);
+	public ChangeAttribValueDialog(final DesiredAttributeChangeListener listener, final Attribute attribute) {
+		setTitle("Add/Edit values for "+attribute.getViewName());
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -47,12 +50,7 @@ public class ChangeAttribValueDialog extends JDialog {
 		}
 		{
 			textAreaValues = new JTextArea();
-            String[] values = currentValues.split(",");
-            StringBuilder valuesString = new StringBuilder();
-            for (int i = 0; i < values.length; i++) {
-                valuesString.append(values[i]).append("\n");
-            }
-            textAreaValues.setText(valuesString.toString());
+            textAreaValues.setText(attribute.getValue().toString());
             contentPanel.setViewportView(textAreaValues);
 		}
 		{
@@ -64,15 +62,9 @@ public class ChangeAttribValueDialog extends JDialog {
 				okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        String[] values = textAreaValues.getText().split(",");
-                        StringBuilder valuesString = new StringBuilder();
-                        for (int i = 0; i < values.length; i++) {
-                            if(i!=0){
-                                valuesString.append(",");
-                            }
-                            valuesString.append(values[i]);
-                        }
-                        listener.onDesiredAttributeValueChange(attribute,valuesString.toString());
+                        String value = textAreaValues.getText();
+                        attribute.setValue(value);
+                        listener.onDesiredAttributeValueChange(attribute);
                         ChangeAttribValueDialog.this.setVisible(false);
                     }
                 });
