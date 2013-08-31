@@ -1,6 +1,5 @@
 package org.zaproxy.zap.extension.saml.ui;
 
-import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
 import org.zaproxy.zap.extension.saml.*;
 
@@ -38,11 +37,11 @@ public class SAMLRequestEditor {
     private JButton resetButton;                        //Button to reset the request items
 
     //Other variables
-    private SAMLMessageChanger samlMessage;
+    private SAMLMessage samlMessage;
 
     public SAMLRequestEditor(HttpMessage message) {
         try {
-            samlMessage = new SAMLMessageChanger(message);
+            samlMessage = new SAMLMessage(message);
         } catch (SAMLException e) {
             //todo show error dialog
         }

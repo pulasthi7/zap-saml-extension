@@ -2,7 +2,6 @@ package org.zaproxy.zap.extension.saml;
 
 import org.apache.log4j.Logger;
 import org.parosproxy.paros.core.proxy.ProxyListener;
-import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
 
 import java.util.Map;
@@ -30,7 +29,7 @@ public class SAMLProxyListener implements ProxyListener {
     public boolean onHttpRequestSend(HttpMessage message) {
         if (active && SAMLUtils.hasSAMLMessage(message)) {
             try {
-                SAMLMessageChanger samlMessage = new SAMLMessageChanger(message);
+                SAMLMessage samlMessage = new SAMLMessage(message);
 
                 //change the params
                 for (Map.Entry<Object, Object> entry : autoChangeAttribs.entrySet()) {
