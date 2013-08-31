@@ -100,7 +100,7 @@ public class AutoChangerSettingUI extends JFrame implements DesiredAttributeChan
         attributeSet = new LinkedHashSet<>();
         Map<String,Attribute> allAttributes = new LinkedHashMap<>();
         try {
-            for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes().getAttributes()) {
+            for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes()) {
                 allAttributes.put(attribute.getName(),attribute);
             }
 

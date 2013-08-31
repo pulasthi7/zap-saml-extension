@@ -6,16 +6,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.util.Set;
 
 public class SAMLConfiguration {
 
-    private static final String SAML_AUTOCHANGE_CONF_FILE = "saml_autochange_attributes.xml";
-    private static final String SAML_ATTRIB_FILE = "saml_configured_attributes.xml";
+    private static final String SAML_CONF_FILE = "zap_saml_conf.xml";
     private static SAMLConfiguration configuration = new SAMLConfiguration();
 
     private boolean initialized;
-    private AttributeSet availableAttributes;
-    private AttributeSet autoChangeValues;
+
+    private SAMLConfigData configData;
 
     public static SAMLConfiguration getConfiguration() throws SAMLException {
         if(!configuration.initialized){
@@ -30,47 +30,28 @@ public class SAMLConfiguration {
      * @throws SAMLException
      */
     public void initialize() throws SAMLException {
-        String allAttribFilePath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" +
-                SAML_ATTRIB_FILE;
-        File allAttribFile = new File(allAttribFilePath);
+        String confPath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" +
+                SAML_CONF_FILE;
+        File confFile = new File(confPath);
 
-        if(allAttribFile.exists()){
-            //load from the file
-        } else {
-            allAttribFile = new File(SAMLConfiguration.class.getResource(SAML_ATTRIB_FILE).getFile());
-            if (!allAttribFile.exists()){
+        if(!confFile.exists()){
+            confFile = new File(SAMLConfiguration.class.getResource(SAML_CONF_FILE).getFile());
+            if (!confFile.exists()){
                 throw new SAMLException("Configuration file not found");
             }
             //todo:create a copy at user directory
         }
-        //load the attributes
-        AttributeSet attributeSet = (AttributeSet) loadXMLObject(AttributeSet.class,allAttribFile);
-        availableAttributes = attributeSet;
 
-        String autoChangeAttribFilePath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath
-                ()+ "/" + SAML_AUTOCHANGE_CONF_FILE;
-        File autoChangeAttribFile = new File(autoChangeAttribFilePath);
-        if(autoChangeAttribFile.exists()){
-            //todo parse
-        }else {
-            autoChangeValues = new AttributeSet();
-        }
+        //load the configuration
+        configData = (SAMLConfigData) loadXMLObject(SAMLConfigData.class,confFile);
     }
 
-    public AttributeSet getAvailableAttributes() {
-        return availableAttributes;
+    public Set<Attribute> getAvailableAttributes() {
+        return configData.getAvailableAttributes();
     }
 
-    public void setAvailableAttributes(AttributeSet availableAttributes) {
-        this.availableAttributes = availableAttributes;
-    }
-
-    public AttributeSet getAutoChangeValues() {
-        return autoChangeValues;
-    }
-
-    public void setAutoChangeValues(AttributeSet autoChangeValues) {
-        this.autoChangeValues = autoChangeValues;
+    public Set<Attribute> getAutoChangeAttributes(){
+        return configData.getAutoChangeValues();
     }
 
     /**

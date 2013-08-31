@@ -8,9 +8,7 @@ import org.parosproxy.paros.network.HttpMessage;
 
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;

@@ -48,7 +48,7 @@ public class AddNewAttribute extends JDialog {
                 attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
 				comboBoxAttribSelect = new JComboBox<>();
                 try {
-                    for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes().getAttributes()) {
+                    for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes()) {
                         if(!listener.getDesiredAttributes().contains(attribute.getName())){
                             comboBoxAttribSelect.addItem(attribute);
                         }
