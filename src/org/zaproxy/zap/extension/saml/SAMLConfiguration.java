@@ -2,9 +2,10 @@ package org.zaproxy.zap.extension.saml;
 
 import org.parosproxy.paros.model.Model;
 
-import javax.xml.bind.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.Map;
 
 public class SAMLConfiguration {
 
@@ -19,6 +20,7 @@ public class SAMLConfiguration {
     public static SAMLConfiguration getConfiguration() throws SAMLException {
         if(!configuration.initialized){
             configuration.initialize();
+            configuration.initialized = true;
         }
         return configuration;
     }
