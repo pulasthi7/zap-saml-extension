@@ -146,11 +146,9 @@ public class SAMLUtils {
                 default:
                     break;
             }
-        } catch (UnsupportedEncodingException e) {
-
-        } catch (SAMLException e) {
-
+        } catch (UnsupportedEncodingException | SAMLException e) {
+            log.error(e);
         }
-        return val;
+        return "";
     }
 }

@@ -36,14 +36,11 @@ public class AddNewAttributeDialog extends JDialog {
 				comboBoxAttribSelect = new JComboBox<>();
                 try {
                     for (Attribute attribute : SAMLConfiguration.getConfiguration().getAvailableAttributes()) {
-                        if(!listener.getDesiredAttributes().contains(attribute.getName())){
+                        if(!listener.getDesiredAttributes().contains(attribute)){
                             comboBoxAttribSelect.addItem((Attribute) attribute.clone());
                         }
                     }
-                } catch (SAMLException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (SAMLException | CloneNotSupportedException ignored) {
                 }
                 comboBoxAttribSelect.setMaximumRowCount(5);
 				attribNamePanel.add(comboBoxAttribSelect);
@@ -81,7 +78,7 @@ public class AddNewAttributeDialog extends JDialog {
                         }
                         if(txtAttribValues.getText().equals("")){
                             JOptionPane.showMessageDialog(AddNewAttributeDialog.this,"No values given, " +
-                                    "Please provide a non-empty value","Error in value", JOptionPane.OK_OPTION);
+                                    "Please provide a non-empty value","Error in value", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                         Attribute attribute = ((Attribute)comboBoxAttribSelect.getSelectedItem());

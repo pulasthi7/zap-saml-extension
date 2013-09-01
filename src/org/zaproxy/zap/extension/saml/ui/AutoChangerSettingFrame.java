@@ -60,9 +60,14 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
                     SAMLConfiguration.getConfiguration().getAutoChangeAttributes().clear();
                     SAMLConfiguration.getConfiguration().getAutoChangeAttributes().addAll(attributeSet);
                     listener.loadAutoChangeAttributes();
-                    SAMLConfiguration.getConfiguration().saveConfiguration();
-                } catch (SAMLException e1) {
-                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    boolean success = SAMLConfiguration.getConfiguration().saveConfiguration();
+                    if(success){
+                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",JOptionPane.OK_OPTION);
+                    } else{
+                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",JOptionPane.OK_OPTION);
+                    }
+                } catch (SAMLException ignored) {
+
                 }
             }
         });
@@ -98,10 +103,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
                 clonedAttribute.setValue(autoChangeAttribute.getValue());
                 attributeSet.add(clonedAttribute);
             }
-        } catch (SAMLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (SAMLException | CloneNotSupportedException ignored) {
         }
     }
 

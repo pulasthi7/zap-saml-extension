@@ -1,5 +1,6 @@
 package org.zaproxy.zap.extension.saml;
 
+import org.apache.log4j.Logger;
 import org.parosproxy.paros.model.Model;
 
 import javax.xml.bind.JAXBContext;
@@ -7,6 +8,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Set;
 
 public class SAMLConfiguration {
@@ -15,8 +18,9 @@ public class SAMLConfiguration {
     private static SAMLConfiguration configuration = new SAMLConfiguration();
 
     private boolean initialized;
-
     private SAMLConfigData configData;
+
+    protected static Logger log = Logger.getLogger(SAMLConfiguration.class);
 
     public static SAMLConfiguration getConfiguration() throws SAMLException {
         if(!configuration.initialized){
@@ -36,11 +40,18 @@ public class SAMLConfiguration {
         File confFile = new File(confPath);
 
         if(!confFile.exists()){
-            confFile = new File(SAMLConfiguration.class.getResource(SAML_CONF_FILE).getFile());
-            if (!confFile.exists()){
+            File defaultConfFile = new File(SAMLConfiguration.class.getResource(SAML_CONF_FILE).getFile());
+            if (defaultConfFile.exists()){
                 throw new SAMLException("Configuration file not found");
             }
-            //todo:create a copy at user directory
+
+            //try to copy configuration to user directory
+            try {
+                Files.copy(defaultConfFile.toPath(),confFile.toPath());
+            } catch (IOException e) {
+                throw new SAMLException("SAML Configuration file can't be modified, Will lose changes at exit");
+            }
+            confFile = defaultConfFile;
         }
 
         //load the configuration
@@ -71,7 +82,7 @@ public class SAMLConfiguration {
         configData.setXswEnabled(value);
     }
 
-    public void saveConfiguration(){
+    public boolean saveConfiguration(){
         try {
             JAXBContext context = JAXBContext.newInstance(SAMLConfigData.class);
             Marshaller marshaller = context.createMarshaller();
@@ -79,16 +90,18 @@ public class SAMLConfiguration {
             String confPath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" +
                     SAML_CONF_FILE;
             marshaller.marshal(configData,new File(confPath));
+            return true;
         } catch (JAXBException e) {
-
+            log.error("Saving configuration failed");
         }
+        return false;
     }
 
     /**
      * Unmarshall the XML file and extract the object using JAXB
      * @param clazz class of the object
      * @param file xml file
-     * @return
+     * @return unmarshalled object
      * @throws SAMLException
      */
     private Object loadXMLObject(Class clazz, File file) throws SAMLException {
@@ -100,6 +113,4 @@ public class SAMLConfiguration {
             throw new SAMLException("XML loading failed",e);
         }
     }
-
-
 }
