@@ -48,7 +48,7 @@ public class SAMLProxyListener implements ProxyListener {
                     message.setRequestBody(changedMessege.getRequestBody());
                     message.setRequestHeader(changedMessege.getRequestHeader());
                 }
-            } catch (SAMLException e) {
+            } catch (SAMLException ignored) {
             }
         }
         return true;

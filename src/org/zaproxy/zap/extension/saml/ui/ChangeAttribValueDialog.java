@@ -19,20 +19,6 @@ import javax.swing.JTextArea;
 public class ChangeAttribValueDialog extends JDialog {
 
     private JTextArea textAreaValues;
-    private final JScrollPane contentPanel = new JScrollPane();
-
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		try {
-//			ChangeAttribValueDialog dialog = new ChangeAttribValueDialog();
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
 
 	/**
 	 * Create the dialog.
@@ -41,7 +27,8 @@ public class ChangeAttribValueDialog extends JDialog {
 		setTitle("Add/Edit values for "+attribute.getViewName());
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        JScrollPane contentPanel = new JScrollPane();
+        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{

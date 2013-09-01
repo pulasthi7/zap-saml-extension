@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 
 public class AddNewAttributeDialog extends JDialog {
 
-	private final JPanel contentPanel = new JPanel();
     private JComboBox<Attribute> comboBoxAttribSelect;
     private JTextField txtAttribValues;
 
@@ -22,7 +21,8 @@ public class AddNewAttributeDialog extends JDialog {
         setTitle("Add New Attribute");
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        JPanel contentPanel = new JPanel();
+        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{

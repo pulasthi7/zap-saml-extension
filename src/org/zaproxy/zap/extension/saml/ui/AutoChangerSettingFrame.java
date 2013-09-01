@@ -62,9 +62,11 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
                     listener.loadAutoChangeAttributes();
                     boolean success = SAMLConfiguration.getConfiguration().saveConfiguration();
                     if(success){
-                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",JOptionPane.OK_OPTION);
+                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
+                                JOptionPane.INFORMATION_MESSAGE);
                     } else{
-                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",JOptionPane.OK_OPTION);
+                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (SAMLException ignored) {
 
