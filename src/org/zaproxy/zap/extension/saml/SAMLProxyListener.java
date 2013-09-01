@@ -5,8 +5,6 @@ import org.parosproxy.paros.core.proxy.ProxyListener;
 import org.parosproxy.paros.network.HttpMessage;
 
 import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 public class SAMLProxyListener implements ProxyListener {
@@ -35,8 +33,7 @@ public class SAMLProxyListener implements ProxyListener {
 
                 //change the params
                 for (Attribute attribute : autoChangeAttribs) {
-                    //todo:for now, only the first value is taken into consideration, need to fix this
-                    String value = attribute.getValue().toString().split(",")[0];
+                    String value = attribute.getValue().toString();
                     samlMessage.changeAttributeValueTo(attribute.getName(), value);
                 }
 

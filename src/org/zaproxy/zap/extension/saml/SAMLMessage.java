@@ -1,6 +1,7 @@
 package org.zaproxy.zap.extension.saml;
 
 import org.apache.commons.httpclient.URIException;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.parosproxy.paros.network.HtmlParameter;
 import org.parosproxy.paros.network.HttpMessage;
@@ -34,9 +35,11 @@ public class SAMLMessage {
     private Document xmlDocument;
     private Map<String, Attribute> attributeMap;
 
+    protected static Logger log = Logger.getLogger(SAMLMessage.class);
+
     /**
      * Create a new saml message object from the httpmessage
-     * @param httpMessage
+     * @param httpMessage The http message that contain the saml message
      * @throws SAMLException
      */
     public SAMLMessage(HttpMessage httpMessage) throws SAMLException {
@@ -101,48 +104,47 @@ public class SAMLMessage {
 
     /**
      * Get the saml attributes from the saml message which are also in the configured list
-     * @throws SAMLException
      */
-    private void buildAttributeMap() throws SAMLException {
+    private void buildAttributeMap() {
         // xpath initialization
         XPathFactory xFactory = XPathFactory.newInstance();
         XPath xpath = xFactory.newXPath();
-        Set<Attribute> allAttributes = SAMLConfiguration.getConfiguration().getAvailableAttributes();
-        for (Attribute attribute : allAttributes) {
-            try {
-                XPathExpression expression = xpath.compile(attribute.getxPath());
-                Node node = (Node)expression.evaluate(xmlDocument,XPathConstants.NODE);
-                if(node!=null){     //the attributes that aren't available will be giving null values
-                    String value = "";
-                    if(node instanceof Element){
-                        value = ((Element)node).getTextContent();
-                    } else if(node instanceof Attr){
-                        value = ((Attr)node).getValue();
-                    } else {
-                        value = node.getNodeValue();
+        try {
+            Set<Attribute> allAttributes = SAMLConfiguration.getConfiguration().getAvailableAttributes();
+            for (Attribute attribute : allAttributes) {
+                try {
+                    XPathExpression expression = xpath.compile(attribute.getxPath());
+                    Node node = (Node)expression.evaluate(xmlDocument,XPathConstants.NODE);
+                    if(node!=null){     //the attributes that aren't available will be giving null values
+                        String value;
+                        if(node instanceof Element){
+                            value = node.getTextContent();
+                        } else if(node instanceof Attr){
+                            value = ((Attr)node).getValue();
+                        } else {
+                            value = node.getNodeValue();
+                        }
+                        if(value!=null && !"".equals(value)){
+                            Attribute newAttrib = (Attribute) attribute.clone();
+                            newAttrib.setValue(value);
+                            attributeMap.put(attribute.getName(),newAttrib);
+                        }
                     }
-                    if(value!=null && !"".equals(value)){
-                        Attribute newAttrib = (Attribute) attribute.clone();
-                        newAttrib.setValue(value);
-                        attributeMap.put(attribute.getName(),newAttrib);
-                    }
+                } catch (XPathExpressionException e) {
+                    log.warn(attribute.getxPath()+" is not a valid XPath",e);
+                } catch (CloneNotSupportedException ignored) {
                 }
-            } catch (XPathExpressionException e) {
-                //can't be evaluated
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (CloneNotSupportedException e) {
-                //won't be thrown
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
+        } catch (SAMLException ignored) {
+            //Thrown in initializing configuration, won't be occuring at this place
         }
-
     }
 
     /**
      * Check whether the values are applicable to the selected attribute
-     * @param type
-     * @param value
-     * @return
+     * @param type Param type that is expected
+     * @param value Param value to be tested against
+     * @return Object that matches the relevant type is valid, null if invalid
      */
     private Object validateValueType(Attribute.SAMLAttributeValueType type, String value){
         try {
@@ -171,10 +173,18 @@ public class SAMLMessage {
         XPath xpath = xFactory.newXPath();
         for (Attribute attribute : attributeMap.values()) {
             try {
-                NodeList nodeList = (NodeList) xpath.compile(attribute.getxPath()).evaluate(xmlDocument, XPathConstants.NODESET);
-                nodeList.item(0).setNodeValue(attribute.getValue().toString());
+                Node node = (Node) xpath.compile(attribute.getxPath()).evaluate(xmlDocument, XPathConstants.NODE);
+                if(node!=null){     //the attributes that aren't available will be giving null values
+                    if(node instanceof Element){
+                        node.setTextContent(attribute.getValue().toString());
+                    } else if(node instanceof Attr){
+                        ((Attr) node).setValue(attribute.getValue().toString());
+                    } else {
+                        node.setNodeValue(attribute.getValue().toString());
+                    }
+                }
             } catch (XPathExpressionException e) {
-
+                log.warn(attribute.getxPath() + " is not a valid XPath", e);
             }
         }
     }
@@ -186,12 +196,11 @@ public class SAMLMessage {
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
             StringWriter writer = new StringWriter();
             transformer.transform(new DOMSource(xmlDocument), new StreamResult(writer));
-            samlMessageString = writer.getBuffer().toString().replaceAll("\n|\r", "");
-        } catch (TransformerException e) {
-
+            samlMessageString = writer.getBuffer().toString().replaceAll("[\\n\\r]", "");
+        } catch (TransformerException ignored) {
         }
     }
 
@@ -238,11 +247,11 @@ public class SAMLMessage {
             }
             httpMessage.setRequestBody(newParamBuilder.toString());
         } catch (UnsupportedEncodingException e) {
-
+            log.warn("Unsupported encoding.",e);
         } catch (URIException e) {
-
+            log.warn("Unsupported URI query",e);
         } catch (SAMLException e) {
-
+            log.warn("saml message extraction failed",e);
         }
         messageChanged =false;  //the message is permanently modified, can't revert from here on
     }
@@ -270,7 +279,7 @@ public class SAMLMessage {
 
     /**
      * Get the new HTTPmessage with changed parameters
-     * @return
+     * @return The changed http message if changed, original message if message unchanged.
      */
     public HttpMessage getChangedMessege(){
         if(!messageChanged){
@@ -293,8 +302,8 @@ public class SAMLMessage {
                 buildXMLDocument();
                 buildAttributeMap();
                 messageChanged = false;
-            } catch (SAMLException e) {
-
+            } catch (SAMLException ignored) {
+                log.warn(ignored);
             }
         }
     }
@@ -332,14 +341,15 @@ public class SAMLMessage {
     public void setSamlMessageString(String samlMessageString) {
         samlMessageString = samlMessageString.trim().replaceAll("\n","").replaceAll("\\s+"," ");
         if(!this.samlMessageString.equals(samlMessageString)){
-            //todo validate
+            String oldValue = this.samlMessageString;
             this.samlMessageString = samlMessageString;
             try {
                 buildXMLDocument();
                 buildAttributeMap();
                 messageChanged = true;
             } catch (SAMLException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                this.samlMessageString = oldValue;
+                log.warn("Not a valid saml message",e);
             }
         }
     }
