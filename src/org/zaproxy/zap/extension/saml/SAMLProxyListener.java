@@ -37,7 +37,10 @@ public class SAMLProxyListener implements ProxyListener {
                 //change the params
                 for (Attribute attribute : autoChangeAttribs) {
                     String value = attribute.getValue().toString();
-                    samlMessage.changeAttributeValueTo(attribute.getName(), value);
+                    boolean changed = samlMessage.changeAttributeValueTo(attribute.getName(), value);
+                    if(changed){
+                        log.debug(attribute.getName()+": value changed to "+value);
+                    }
                 }
 
                 //change the original message
