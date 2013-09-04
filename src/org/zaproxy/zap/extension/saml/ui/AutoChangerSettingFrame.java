@@ -56,20 +56,16 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
         btnSaveChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    SAMLConfiguration.getConfiguration().getAutoChangeAttributes().clear();
-                    SAMLConfiguration.getConfiguration().getAutoChangeAttributes().addAll(attributeSet);
-                    listener.loadAutoChangeAttributes();
-                    boolean success = SAMLConfiguration.getConfiguration().saveConfiguration();
-                    if(success){
-                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } else{
-                        JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (SAMLException ignored) {
-
+                SAMLConfiguration.getConfiguration().getAutoChangeAttributes().clear();
+                SAMLConfiguration.getConfiguration().getAutoChangeAttributes().addAll(attributeSet);
+                listener.loadAutoChangeAttributes();
+                boolean success = SAMLConfiguration.getConfiguration().saveConfiguration();
+                if(success){
+                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else{
+                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -105,7 +101,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
                 clonedAttribute.setValue(autoChangeAttribute.getValue());
                 attributeSet.add(clonedAttribute);
             }
-        } catch (SAMLException | CloneNotSupportedException ignored) {
+        } catch (CloneNotSupportedException ignored) {
         }
     }
 
