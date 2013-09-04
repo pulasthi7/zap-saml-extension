@@ -15,7 +15,10 @@ public class SAMLProxyListener implements ProxyListener {
     protected static Logger log = Logger.getLogger(SAMLProxyListener.class.getName());
 
     public SAMLProxyListener() {
-        setActive(SAMLConfiguration.getConfiguration().getAutoChangeEnabled());
+        try {
+            setActive(SAMLConfiguration.getConfiguration().getAutoChangeEnabled());
+        } catch (SAMLException ignored) {
+        }
     }
 
     public void setActive(boolean value) {
@@ -65,6 +68,10 @@ public class SAMLProxyListener implements ProxyListener {
     }
 
     public void loadAutoChangeAttributes() {
-        autoChangeAttribs = SAMLConfiguration.getConfiguration().getAutoChangeAttributes();
+        try {
+            autoChangeAttribs = SAMLConfiguration.getConfiguration().getAutoChangeAttributes();
+        } catch (SAMLException e) {
+            autoChangeAttribs = new LinkedHashSet<>();
+        }
     }
 }
