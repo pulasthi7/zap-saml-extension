@@ -109,7 +109,7 @@ public class SAMLMessage {
         // xpath initialization
         XPathFactory xFactory = XPathFactory.newInstance();
         XPath xpath = xFactory.newXPath();
-        Set<Attribute> allAttributes = SAMLConfiguration.getConfiguration().getAvailableAttributes();
+        Set<Attribute> allAttributes = SAMLConfiguration.getConfigurations().getAvailableAttributes();
         for (Attribute attribute : allAttributes) {
             try {
                 XPathExpression expression = xpath.compile(attribute.getxPath());

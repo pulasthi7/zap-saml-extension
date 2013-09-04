@@ -56,10 +56,10 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
         btnSaveChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SAMLConfiguration.getConfiguration().getAutoChangeAttributes().clear();
-                SAMLConfiguration.getConfiguration().getAutoChangeAttributes().addAll(attributeSet);
+                SAMLConfiguration.getConfigurations().getAutoChangeAttributes().clear();
+                SAMLConfiguration.getConfigurations().getAutoChangeAttributes().addAll(attributeSet);
                 listener.loadAutoChangeAttributes();
-                boolean success = SAMLConfiguration.getConfiguration().saveConfiguration();
+                boolean success = SAMLConfiguration.getConfigurations().saveConfiguration();
                 if(success){
                     JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
                             JOptionPane.INFORMATION_MESSAGE);
@@ -96,7 +96,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
     private void loadAutoChangeAttributes(){
         attributeSet = new LinkedHashSet<>();
         try {
-            for (Attribute autoChangeAttribute : SAMLConfiguration.getConfiguration().getAutoChangeAttributes()) {
+            for (Attribute autoChangeAttribute : SAMLConfiguration.getConfigurations().getAutoChangeAttributes()) {
                 Attribute clonedAttribute = (Attribute)autoChangeAttribute.clone();
                 clonedAttribute.setValue(autoChangeAttribute.getValue());
                 attributeSet.add(clonedAttribute);

@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SAMLExtension</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.zaproxy.zap.extension.saml</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SAMLExtension (org.zaproxy.zap.extension.saml)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SAMLExtension</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SAMLExtension$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.zaproxy.zap.extension.saml;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.apache.log4j.Logger;
+<i>4</i>&nbsp;import org.parosproxy.paros.Constant;
+<i>5</i>&nbsp;import org.parosproxy.paros.extension.ExtensionAdaptor;
+<i>6</i>&nbsp;import org.parosproxy.paros.extension.ExtensionHook;
+<i>7</i>&nbsp;import org.parosproxy.paros.extension.ExtensionPopupMenuItem;
+<i>8</i>&nbsp;import org.zaproxy.zap.extension.ExtensionPopupMenu;
+<i>9</i>&nbsp;import org.zaproxy.zap.extension.saml.ui.AutoChangerSettingFrame;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import javax.swing.*;
+<i>12</i>&nbsp;import java.awt.event.ActionEvent;
+<i>13</i>&nbsp;import java.awt.event.ActionListener;
+<i>14</i>&nbsp;import java.net.MalformedURLException;
+<i>15</i>&nbsp;import java.net.URL;
+<i>16</i>&nbsp;
+<b class="nc"><i>17</i>&nbsp;public class SAMLExtension extends ExtensionAdaptor {</b>
+<i>18</i>&nbsp;
+<b class="nc"><i>19</i>&nbsp;    protected static Logger log = Logger.getLogger(SAMLExtension.class);</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @Override
+<i>22</i>&nbsp;    public URL getURL() {
+<i>23</i>&nbsp;        try {
+<b class="nc"><i>24</i>&nbsp;            return new URL(Constant.ZAP_HOMEPAGE);</b>
+<b class="nc"><i>25</i>&nbsp;        } catch (MalformedURLException e) {</b>
+<b class="nc"><i>26</i>&nbsp;            return null;</b>
+<i>27</i>&nbsp;        }
+<i>28</i>&nbsp;    }
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    @Override
+<i>31</i>&nbsp;    public String getAuthor() {
+<b class="nc"><i>32</i>&nbsp;        return Constant.ZAP_TEAM;</b>
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    @Override
+<i>36</i>&nbsp;    public void hook(ExtensionHook extensionHook) {
+<b class="nc"><i>37</i>&nbsp;        super.hook(extensionHook);</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;        try {
+<b class="nc"><i>40</i>&nbsp;            SAMLConfiguration conf = SAMLConfiguration.getConfigurations();</b>
+<b class="nc"><i>41</i>&nbsp;            conf.initialize();</b>
+<b class="nc"><i>42</i>&nbsp;            if (getView() != null &amp;&amp; conf!=null) {</b>
+<b class="nc"><i>43</i>&nbsp;                final SAMLProxyListener proxyListener = new SAMLProxyListener();</b>
+<b class="nc"><i>44</i>&nbsp;                extensionHook.addProxyListener(proxyListener);</b>
+<i>45</i>&nbsp;
+<b class="nc"><i>46</i>&nbsp;                ExtensionPopupMenu samlMenu = new ExtensionPopupMenu(&quot;SAML Actions&quot;);</b>
+<b class="nc"><i>47</i>&nbsp;                ExtensionPopupMenuItem samlResendMenuItem = new SAMLResendMenuItem(&quot;Resend...&quot;);</b>
+<i>48</i>&nbsp;
+<b class="nc"><i>49</i>&nbsp;                samlMenu.add(samlResendMenuItem);</b>
+<b class="nc"><i>50</i>&nbsp;                extensionHook.getHookMenu().addPopupMenuItem(samlMenu);</b>
+<i>51</i>&nbsp;
+<b class="nc"><i>52</i>&nbsp;                JMenuItem samlActiveEditorMenu = new JMenuItem(&quot;SAML Request Editor&quot;);</b>
+<b class="nc"><i>53</i>&nbsp;                samlActiveEditorMenu.addActionListener(new ActionListener() {</b>
+<i>54</i>&nbsp;                    @Override
+<i>55</i>&nbsp;                    public void actionPerformed(ActionEvent e) {
+<b class="nc"><i>56</i>&nbsp;                        AutoChangerSettingFrame settingUI = new AutoChangerSettingFrame(proxyListener);</b>
+<b class="nc"><i>57</i>&nbsp;                        settingUI.setVisible(true);</b>
+<i>58</i>&nbsp;                    }
+<i>59</i>&nbsp;                });
+<b class="nc"><i>60</i>&nbsp;                extensionHook.getHookMenu().addToolsMenuItem(samlActiveEditorMenu);</b>
+<i>61</i>&nbsp;            }
+<b class="nc"><i>62</i>&nbsp;        } catch (SAMLException e) {</b>
+<b class="nc"><i>63</i>&nbsp;            log.error(&quot;SAML Extension can&#39;t be loaded. Configuration not found or invalid&quot;);</b>
+<b class="nc"><i>64</i>&nbsp;        }</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2013-09-04 10:46</div>
+</div>
+</body>
+</html>

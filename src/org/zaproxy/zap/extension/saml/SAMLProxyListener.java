@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.parosproxy.paros.core.proxy.ProxyListener;
 import org.parosproxy.paros.network.HttpMessage;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class SAMLProxyListener implements ProxyListener {
@@ -15,7 +14,7 @@ public class SAMLProxyListener implements ProxyListener {
     protected static Logger log = Logger.getLogger(SAMLProxyListener.class.getName());
 
     public SAMLProxyListener() {
-        setActive(SAMLConfiguration.getConfiguration().getAutoChangeEnabled());
+        setActive(SAMLConfiguration.getConfigurations().getAutoChangeEnabled());
     }
 
     public void setActive(boolean value) {
@@ -65,6 +64,6 @@ public class SAMLProxyListener implements ProxyListener {
     }
 
     public void loadAutoChangeAttributes() {
-        autoChangeAttribs = SAMLConfiguration.getConfiguration().getAutoChangeAttributes();
+        autoChangeAttribs = SAMLConfiguration.getConfigurations().getAutoChangeAttributes();
     }
 }

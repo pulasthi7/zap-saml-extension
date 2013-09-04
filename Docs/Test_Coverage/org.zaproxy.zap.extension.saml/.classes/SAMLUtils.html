@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SAMLUtils</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.zaproxy.zap.extension.saml</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SAMLUtils (org.zaproxy.zap.extension.saml)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SAMLUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.1%
+  </span>
+  <span class="absValue">
+    (26/ 49)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SAMLUtils$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54%
+  </span>
+  <span class="absValue">
+    (27/ 50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.zaproxy.zap.extension.saml;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.apache.log4j.Logger;
+<i>4</i>&nbsp;import org.parosproxy.paros.extension.encoder.Base64;
+<i>5</i>&nbsp;import org.parosproxy.paros.network.HtmlParameter;
+<i>6</i>&nbsp;import org.parosproxy.paros.network.HttpMessage;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.io.ByteArrayOutputStream;
+<i>9</i>&nbsp;import java.io.IOException;
+<i>10</i>&nbsp;import java.io.UnsupportedEncodingException;
+<i>11</i>&nbsp;import java.net.URLDecoder;
+<i>12</i>&nbsp;import java.util.zip.DataFormatException;
+<i>13</i>&nbsp;import java.util.zip.Deflater;
+<i>14</i>&nbsp;import java.util.zip.DeflaterOutputStream;
+<i>15</i>&nbsp;import java.util.zip.Inflater;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;/**
+<i>18</i>&nbsp; * Contains some frequent methods related to decoding and encoding SAML messages
+<i>19</i>&nbsp; */
+<i>20</i>&nbsp;public class SAMLUtils {
+<i>21</i>&nbsp;    private static final int MAX_INFLATED_SIZE = 5000;
+<i>22</i>&nbsp;
+<b class="fc"><i>23</i>&nbsp;    protected static Logger log = Logger.getLogger(SAMLUtils.class);</b>
+<i>24</i>&nbsp;    /**
+<i>25</i>&nbsp;     * Private constructor, because this class is and Util class and the methods are static
+<i>26</i>&nbsp;     */
+<b class="nc"><i>27</i>&nbsp;    private SAMLUtils(){</b>
+<b class="nc"><i>28</i>&nbsp;    }</b>
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    /**
+<i>31</i>&nbsp;     * Base 64 decode a given string and gives the decoded data as a byte array
+<i>32</i>&nbsp;     * @param message The String to base 64 decode
+<i>33</i>&nbsp;     * @return Byte array of the decoded string
+<i>34</i>&nbsp;     * @throws SAMLException
+<i>35</i>&nbsp;     */
+<i>36</i>&nbsp;    public static byte[] b64Decode(String message) throws SAMLException{
+<i>37</i>&nbsp;        try {
+<b class="fc"><i>38</i>&nbsp;            return Base64.decode(message);</b>
+<b class="nc"><i>39</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>40</i>&nbsp;            throw new SAMLException(&quot;Base 64 Decode of failed for message: \n&quot;+message,e);</b>
+<i>41</i>&nbsp;        }
+<i>42</i>&nbsp;    }
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    /**
+<i>45</i>&nbsp;     * Base 64 encode the given byte array and gives the encoded string
+<i>46</i>&nbsp;     * @param data The data to encode
+<i>47</i>&nbsp;     * @return Encoded string
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    public static String b64Encode(byte[] data){
+<b class="nc"><i>50</i>&nbsp;        return Base64.encodeBytes(data);</b>
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    /**
+<i>54</i>&nbsp;     * Inflate a message (that had been deflated) and gets the original message
+<i>55</i>&nbsp;     * @param data Byte array of deflated data that need to be inflated
+<i>56</i>&nbsp;     * @return Original message after inflation
+<i>57</i>&nbsp;     * @throws SAMLException
+<i>58</i>&nbsp;     */
+<i>59</i>&nbsp;    public static String inflateMessage(byte[] data) throws SAMLException {
+<i>60</i>&nbsp;        try {
+<b class="fc"><i>61</i>&nbsp;            Inflater inflater = new Inflater(true);</b>
+<b class="fc"><i>62</i>&nbsp;            inflater.setInput(data);</b>
+<b class="fc"><i>63</i>&nbsp;            byte[] xmlMessageBytes = new byte[MAX_INFLATED_SIZE];</b>
+<b class="fc"><i>64</i>&nbsp;            int resultLength = inflater.inflate(xmlMessageBytes);</b>
+<i>65</i>&nbsp;
+<b class="fc"><i>66</i>&nbsp;            if (!inflater.finished()) {</b>
+<b class="nc"><i>67</i>&nbsp;                throw new SAMLException(&quot;Out of space allocated for inflated data&quot;);</b>
+<i>68</i>&nbsp;            }
+<i>69</i>&nbsp;
+<b class="fc"><i>70</i>&nbsp;            inflater.end();</b>
+<i>71</i>&nbsp;
+<b class="fc"><i>72</i>&nbsp;            return new String(xmlMessageBytes, 0, resultLength,</b>
+<i>73</i>&nbsp;                    &quot;UTF-8&quot;);
+<b class="nc"><i>74</i>&nbsp;        } catch (DataFormatException e) {</b>
+<b class="nc"><i>75</i>&nbsp;            throw new SAMLException(&quot;Invalid data format&quot;,e);</b>
+<b class="nc"><i>76</i>&nbsp;        } catch (UnsupportedEncodingException e) {</b>
+<b class="nc"><i>77</i>&nbsp;            throw new SAMLException(&quot;Inflated data is not in valid encoding format&quot;,e);</b>
+<i>78</i>&nbsp;        }
+<i>79</i>&nbsp;    }
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    /**
+<i>82</i>&nbsp;     * Deflate a message to be send over a preferred binding
+<i>83</i>&nbsp;     * @param message Message to be deflated
+<i>84</i>&nbsp;     * @return The deflated message as a byte array
+<i>85</i>&nbsp;     */
+<i>86</i>&nbsp;    public static byte[] deflateMessage(String message) throws SAMLException {
+<i>87</i>&nbsp;        try {
+<b class="nc"><i>88</i>&nbsp;            Deflater deflater = new Deflater(Deflater.DEFLATED, true);</b>
+<b class="nc"><i>89</i>&nbsp;            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();</b>
+<b class="nc"><i>90</i>&nbsp;            DeflaterOutputStream deflaterOutputStream =</b>
+<i>91</i>&nbsp;                    new DeflaterOutputStream(byteArrayOutputStream,
+<i>92</i>&nbsp;                            deflater);
+<i>93</i>&nbsp;
+<b class="nc"><i>94</i>&nbsp;            deflaterOutputStream.write(message.getBytes());</b>
+<b class="nc"><i>95</i>&nbsp;            deflaterOutputStream.close();</b>
+<i>96</i>&nbsp;
+<b class="nc"><i>97</i>&nbsp;            return byteArrayOutputStream.toByteArray();</b>
+<b class="nc"><i>98</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>99</i>&nbsp;           throw new SAMLException(&quot;Message Deflation failed&quot;,e);</b>
+<i>100</i>&nbsp;        }
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * Check whether the httpMessage has a saml message in its parameters
+<i>105</i>&nbsp;     * @param message The HttpMessage to be checked for
+<i>106</i>&nbsp;     * @return whether the message has got a saml message within it
+<i>107</i>&nbsp;     */
+<i>108</i>&nbsp;    public static boolean hasSAMLMessage(HttpMessage message){
+<b class="fc"><i>109</i>&nbsp;        for (HtmlParameter parameter : message.getUrlParams()) {</b>
+<b class="fc"><i>110</i>&nbsp;            if(parameter.getName().equals(&quot;SAMLRequest&quot;) &amp;&amp; isNonEmptyValue(parameter.getValue())){</b>
+<b class="fc"><i>111</i>&nbsp;                return true;</b>
+<i>112</i>&nbsp;            }
+<b class="fc"><i>113</i>&nbsp;            if(parameter.getName().equals(&quot;SAMLResponse&quot;) &amp;&amp; isNonEmptyValue(parameter.getValue())){</b>
+<b class="fc"><i>114</i>&nbsp;                return true;</b>
+<i>115</i>&nbsp;            }
+<b class="fc"><i>116</i>&nbsp;        }</b>
+<b class="fc"><i>117</i>&nbsp;        for (HtmlParameter parameter : message.getFormParams()) {</b>
+<b class="fc"><i>118</i>&nbsp;            if(parameter.getName().equals(&quot;SAMLRequest&quot;) &amp;&amp; isNonEmptyValue(parameter.getValue())){</b>
+<b class="fc"><i>119</i>&nbsp;                return true;</b>
+<i>120</i>&nbsp;            }
+<b class="fc"><i>121</i>&nbsp;            if(parameter.getName().equals(&quot;SAMLResponse&quot;) &amp;&amp; isNonEmptyValue(parameter.getValue())){</b>
+<b class="fc"><i>122</i>&nbsp;                return true;</b>
+<i>123</i>&nbsp;            }
+<b class="fc"><i>124</i>&nbsp;        }</b>
+<b class="fc"><i>125</i>&nbsp;        return false;</b>
+<i>126</i>&nbsp;    }
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    private static boolean isNonEmptyValue(String param){
+<b class="fc"><i>129</i>&nbsp;        return param != null &amp;&amp; !&quot;&quot;.equals(param);</b>
+<i>130</i>&nbsp;    }
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;    /**
+<i>133</i>&nbsp;     * Decode the SAML messages based on the binding used
+<i>134</i>&nbsp;     * @param val the SAML message to decode
+<i>135</i>&nbsp;     * @param binding The binding used
+<i>136</i>&nbsp;     * @return The decoded SAML message if success, or the original string if failed
+<i>137</i>&nbsp;     */
+<i>138</i>&nbsp;    public static String extractSAMLMessage(String val, Binding binding){
+<i>139</i>&nbsp;        try {
+<b class="fc"><i>140</i>&nbsp;            switch (binding) {</b>
+<i>141</i>&nbsp;                case HTTPPost:
+<b class="nc"><i>142</i>&nbsp;                    val = URLDecoder.decode(val, &quot;UTF-8&quot;);</b>
+<i>143</i>&nbsp;                case HTTPRedirect:
+<b class="fc"><i>144</i>&nbsp;                    byte[] b64decoded = b64Decode(val);</b>
+<b class="fc"><i>145</i>&nbsp;                    return inflateMessage(b64decoded);</b>
+<i>146</i>&nbsp;                default:
+<i>147</i>&nbsp;                    break;
+<i>148</i>&nbsp;            }
+<b class="nc"><i>149</i>&nbsp;        } catch (UnsupportedEncodingException | SAMLException e) {</b>
+<b class="nc"><i>150</i>&nbsp;            log.error(e);</b>
+<b class="nc"><i>151</i>&nbsp;        }</b>
+<b class="nc"><i>152</i>&nbsp;        return &quot;&quot;;</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2013-09-04 10:46</div>
+</div>
+</body>
+</html>

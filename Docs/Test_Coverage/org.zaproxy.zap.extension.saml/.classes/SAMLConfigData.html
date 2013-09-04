@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SAMLConfigData</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.zaproxy.zap.extension.saml</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SAMLConfigData (org.zaproxy.zap.extension.saml)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SAMLConfigData</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/ 17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SAMLConfigData$JaxbAccessorM_getAutoChangeValues_setAutoChangeValues_java_util_Set</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SAMLConfigData$JaxbAccessorM_getAvailableAttributes_setAvailableAttributes_java_util_Set</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SAMLConfigData$JaxbAccessorM_isAutoChangerEnabled_setAutoChangerEnabled_boolean</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SAMLConfigData$JaxbAccessorM_isXswEnabled_setXswEnabled_boolean</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    81%
+  </span>
+  <span class="absValue">
+    (17/ 21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.2%
+  </span>
+  <span class="absValue">
+    (33/ 37)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.zaproxy.zap.extension.saml;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import javax.xml.bind.annotation.XmlElement;
+<i>4</i>&nbsp;import javax.xml.bind.annotation.XmlElementWrapper;
+<i>5</i>&nbsp;import javax.xml.bind.annotation.XmlRootElement;
+<i>6</i>&nbsp;import java.util.LinkedHashSet;
+<i>7</i>&nbsp;import java.util.Set;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;@XmlRootElement(namespace = &quot;org.zaproxy.zap.extension.saml&quot;)
+<b class="fc"><i>10</i>&nbsp;public class SAMLConfigData {</b>
+<i>11</i>&nbsp;    private boolean autoChangerEnabled;
+<i>12</i>&nbsp;    private boolean xswEnabled;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;   private Set&lt;Attribute&gt; availableAttributes;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    private Set&lt;Attribute&gt; autoChangeValues;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    public boolean isAutoChangerEnabled() {
+<b class="nc"><i>19</i>&nbsp;        return autoChangerEnabled;</b>
+<i>20</i>&nbsp;    }
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    public void setAutoChangerEnabled(boolean autoChangerEnabled) {
+<b class="fc"><i>23</i>&nbsp;        this.autoChangerEnabled = autoChangerEnabled;</b>
+<b class="fc"><i>24</i>&nbsp;    }</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @XmlElementWrapper(name = &quot;AllAttributes&quot;)
+<i>27</i>&nbsp;    @XmlElement(name = &quot;Attribute&quot;)
+<i>28</i>&nbsp;    public Set&lt;Attribute&gt; getAvailableAttributes() {
+<b class="fc"><i>29</i>&nbsp;        if(availableAttributes==null){</b>
+<b class="fc"><i>30</i>&nbsp;            availableAttributes = new LinkedHashSet&lt;&gt;();</b>
+<i>31</i>&nbsp;        }
+<b class="fc"><i>32</i>&nbsp;        return availableAttributes;</b>
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    public void setAvailableAttributes(Set&lt;Attribute&gt; availableAttributes) {
+<b class="fc"><i>36</i>&nbsp;        this.availableAttributes = availableAttributes;</b>
+<b class="fc"><i>37</i>&nbsp;    }</b>
+<b class="fc"><i>38</i>&nbsp;</b>
+<i>39</i>&nbsp;    public Set&lt;Attribute&gt; getAutoChangeValues() {
+<b class="fc"><i>40</i>&nbsp;        if(autoChangeValues==null){</b>
+<b class="fc"><i>41</i>&nbsp;            autoChangeValues = new LinkedHashSet&lt;&gt;();</b>
+<i>42</i>&nbsp;        }
+<b class="fc"><i>43</i>&nbsp;        return autoChangeValues;</b>
+<b class="nc"><i>44</i>&nbsp;    }</b>
+<b class="fc"><i>45</i>&nbsp;</b>
+<b class="fc"><i>46</i>&nbsp;    @XmlElementWrapper(name = &quot;AutoChangeAttributes&quot;)</b>
+<i>47</i>&nbsp;    @XmlElement(name = &quot;Attribute&quot;)
+<b class="fc"><i>48</i>&nbsp;    public void setAutoChangeValues(Set&lt;Attribute&gt; autoChangeValues) {</b>
+<b class="fc"><i>49</i>&nbsp;        this.autoChangeValues = autoChangeValues;</b>
+<b class="fc"><i>50</i>&nbsp;    }</b>
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    public boolean isXswEnabled() {
+<b class="nc"><i>53</i>&nbsp;        return xswEnabled;</b>
+<i>54</i>&nbsp;    }
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;    public void setXswEnabled(boolean xswEnabled) {
+<b class="fc"><i>57</i>&nbsp;        this.xswEnabled = xswEnabled;</b>
+<b class="fc"><i>58</i>&nbsp;    }</b>
+<i>59</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2013-09-04 10:46</div>
+</div>
+</body>
+</html>

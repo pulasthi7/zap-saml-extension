@@ -22,7 +22,7 @@ public class SAMLConfiguration {
 
     protected static Logger log = Logger.getLogger(SAMLConfiguration.class);
 
-    public static SAMLConfiguration getConfiguration(){
+    public static SAMLConfiguration getConfigurations(){
         return configuration;
     }
 
