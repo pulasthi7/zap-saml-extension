@@ -109,34 +109,30 @@ public class SAMLMessage {
         // xpath initialization
         XPathFactory xFactory = XPathFactory.newInstance();
         XPath xpath = xFactory.newXPath();
-        try {
-            Set<Attribute> allAttributes = SAMLConfiguration.getConfiguration().getAvailableAttributes();
-            for (Attribute attribute : allAttributes) {
-                try {
-                    XPathExpression expression = xpath.compile(attribute.getxPath());
-                    Node node = (Node)expression.evaluate(xmlDocument,XPathConstants.NODE);
-                    if(node!=null){     //the attributes that aren't available will be giving null values
-                        String value;
-                        if(node instanceof Element){
-                            value = node.getTextContent();
-                        } else if(node instanceof Attr){
-                            value = ((Attr)node).getValue();
-                        } else {
-                            value = node.getNodeValue();
-                        }
-                        if(value!=null && !"".equals(value)){
-                            Attribute newAttrib = (Attribute) attribute.clone();
-                            newAttrib.setValue(value);
-                            attributeMap.put(attribute.getName(),newAttrib);
-                        }
+        Set<Attribute> allAttributes = SAMLConfiguration.getConfiguration().getAvailableAttributes();
+        for (Attribute attribute : allAttributes) {
+            try {
+                XPathExpression expression = xpath.compile(attribute.getxPath());
+                Node node = (Node)expression.evaluate(xmlDocument,XPathConstants.NODE);
+                if(node!=null){     //the attributes that aren't available will be giving null values
+                    String value;
+                    if(node instanceof Element){
+                        value = node.getTextContent();
+                    } else if(node instanceof Attr){
+                        value = ((Attr)node).getValue();
+                    } else {
+                        value = node.getNodeValue();
                     }
-                } catch (XPathExpressionException e) {
-                    log.warn(attribute.getxPath()+" is not a valid XPath",e);
-                } catch (CloneNotSupportedException ignored) {
+                    if(value!=null && !"".equals(value)){
+                        Attribute newAttrib = (Attribute) attribute.clone();
+                        newAttrib.setValue(value);
+                        attributeMap.put(attribute.getName(),newAttrib);
+                    }
                 }
+            } catch (XPathExpressionException e) {
+                log.warn(attribute.getxPath()+" is not a valid XPath",e);
+            } catch (CloneNotSupportedException ignored) {
             }
-        } catch (SAMLException ignored) {
-            //Thrown in initializing configuration, won't be occuring at this place
         }
     }
 
@@ -334,6 +330,7 @@ public class SAMLMessage {
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
         } catch (Exception e) {
+            log.warn("error in parsing saml message.",e);
             return samlMessageString;
         }
     }

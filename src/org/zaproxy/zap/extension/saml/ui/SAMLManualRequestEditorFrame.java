@@ -197,6 +197,8 @@ public class SAMLManualRequestEditorFrame {
                 try {
                     SAMLResender.resendMessage(samlMessage.getChangedMessege());
                     updateResponse(samlMessage.getChangedMessege());
+                    resendButton.setEnabled(false);
+                    resetButton.setEnabled(false);
                 } catch (SAMLException e) {
                     JOptionPane.showMessageDialog(requestPanel, e.getMessage(), "Cannot resend request",
                             JOptionPane.ERROR_MESSAGE);

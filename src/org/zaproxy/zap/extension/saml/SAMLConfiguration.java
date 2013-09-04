@@ -22,11 +22,7 @@ public class SAMLConfiguration {
 
     protected static Logger log = Logger.getLogger(SAMLConfiguration.class);
 
-    public static SAMLConfiguration getConfiguration() throws SAMLException {
-        if(!configuration.initialized){
-            configuration.initialize();
-            configuration.initialized = true;
-        }
+    public static SAMLConfiguration getConfiguration(){
         return configuration;
     }
 
@@ -37,6 +33,10 @@ public class SAMLConfiguration {
     public void initialize() throws SAMLException {
         String confPath = Model.getSingleton().getOptionsParam(). getUserDirectory().getAbsolutePath()+ "/" +
                 SAML_CONF_FILE;
+        initialize(confPath);
+    }
+
+    public void initialize(String confPath) throws SAMLException {
         File confFile = new File(confPath);
 
         if(!confFile.exists()){
@@ -56,6 +56,7 @@ public class SAMLConfiguration {
 
         //load the configuration
         configData = (SAMLConfigData) loadXMLObject(SAMLConfigData.class,confFile);
+        initialized = true;
     }
 
     public Set<Attribute> getAvailableAttributes() {

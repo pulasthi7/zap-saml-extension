@@ -40,7 +40,7 @@ public class AddNewAttributeDialog extends JDialog {
                             comboBoxAttribSelect.addItem((Attribute) attribute.clone());
                         }
                     }
-                } catch (SAMLException | CloneNotSupportedException ignored) {
+                } catch (CloneNotSupportedException ignored) {
                 }
                 comboBoxAttribSelect.setMaximumRowCount(5);
 				attribNamePanel.add(comboBoxAttribSelect);

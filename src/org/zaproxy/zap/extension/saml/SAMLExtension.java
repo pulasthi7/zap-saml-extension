@@ -38,6 +38,7 @@ public class SAMLExtension extends ExtensionAdaptor {
 
         try {
             SAMLConfiguration conf = SAMLConfiguration.getConfiguration();
+            conf.initialize();
             if (getView() != null && conf!=null) {
                 final SAMLProxyListener proxyListener = new SAMLProxyListener();
                 extensionHook.addProxyListener(proxyListener);
