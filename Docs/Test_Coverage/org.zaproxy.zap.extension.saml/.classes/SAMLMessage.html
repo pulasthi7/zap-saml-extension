@@ -47,10 +47,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    24%
+    27.3%
   </span>
   <span class="absValue">
-    (44/ 183)
+    (50/ 183)
   </span>
 </td>
 </tr>
@@ -85,10 +85,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    23.9%
+    27.2%
   </span>
   <span class="absValue">
-    (44/ 184)
+    (50/ 184)
   </span>
 </td>
 </tr>
@@ -166,7 +166,7 @@
 <i>66</i>&nbsp;    private void processHTTPMessage() throws SAMLException {
 <i>67</i>&nbsp;        //check whether a saml message
 <b class="fc"><i>68</i>&nbsp;        if(!SAMLUtils.hasSAMLMessage(httpMessage)){</b>
-<b class="nc"><i>69</i>&nbsp;            throw new SAMLException(&quot;Not a SAML Message&quot;);</b>
+<b class="fc"><i>69</i>&nbsp;            throw new SAMLException(&quot;Not a SAML Message&quot;);</b>
 <i>70</i>&nbsp;        }
 <i>71</i>&nbsp;
 <i>72</i>&nbsp;        //get the saml message from the parameters
@@ -179,12 +179,12 @@
 <i>79</i>&nbsp;            }
 <b class="fc"><i>80</i>&nbsp;        }</b>
 <b class="fc"><i>81</i>&nbsp;        for (HtmlParameter formParameter : httpMessage.getFormParams()) {</b>
-<b class="nc"><i>82</i>&nbsp;            if (formParameter.getName().equals(&quot;SAMLRequest&quot;) || formParameter.getName().equals(&quot;SAMLResponse&quot;)) {</b>
-<b class="nc"><i>83</i>&nbsp;                samlMessageString = SAMLUtils.extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);</b>
-<b class="nc"><i>84</i>&nbsp;            } else if (formParameter.getName().equals(&quot;RelayState&quot;)) {</b>
-<b class="nc"><i>85</i>&nbsp;                relayState = formParameter.getValue();</b>
+<b class="fc"><i>82</i>&nbsp;            if (formParameter.getName().equals(&quot;SAMLRequest&quot;) || formParameter.getName().equals(&quot;SAMLResponse&quot;)) {</b>
+<b class="fc"><i>83</i>&nbsp;                samlMessageString = SAMLUtils.extractSAMLMessage(formParameter.getValue(), Binding.HTTPPost);</b>
+<b class="fc"><i>84</i>&nbsp;            } else if (formParameter.getName().equals(&quot;RelayState&quot;)) {</b>
+<b class="fc"><i>85</i>&nbsp;                relayState = formParameter.getValue();</b>
 <i>86</i>&nbsp;            }
-<b class="nc"><i>87</i>&nbsp;        }</b>
+<b class="fc"><i>87</i>&nbsp;        }</b>
 <b class="fc"><i>88</i>&nbsp;    }</b>
 <i>89</i>&nbsp;
 <i>90</i>&nbsp;    /**
@@ -464,7 +464,7 @@
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2013-09-04 10:46</div>
+    <div style="float:right;">generated on 2013-09-04 11:09</div>
 </div>
 </body>
 </html>
