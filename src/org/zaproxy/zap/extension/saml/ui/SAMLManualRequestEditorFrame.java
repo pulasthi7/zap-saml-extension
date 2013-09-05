@@ -195,8 +195,8 @@ public class SAMLManualRequestEditorFrame {
             @Override
             public void actionPerformed(ActionEvent event) {
                 try {
-                    SAMLResender.resendMessage(samlMessage.getChangedMessege());
-                    updateResponse(samlMessage.getChangedMessege());
+                    SAMLResender.resendMessage(samlMessage.getChangedMessage());
+                    updateResponse(samlMessage.getChangedMessage());
                     resendButton.setEnabled(false);
                     resetButton.setEnabled(false);
                 } catch (SAMLException e) {

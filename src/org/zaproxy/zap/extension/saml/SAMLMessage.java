@@ -277,7 +277,7 @@ public class SAMLMessage {
      * Get the new HTTPmessage with changed parameters
      * @return The changed http message if changed, original message if message unchanged.
      */
-    public HttpMessage getChangedMessege(){
+    public HttpMessage getChangedMessage(){
         if(!messageChanged){
             return httpMessage;
         }else{
