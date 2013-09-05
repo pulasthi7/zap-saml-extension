@@ -64,8 +64,13 @@ public class TestConstants {
         nonSamlPostRequestMessage.getRequestHeader().setURI(new HttpsURL("localhost",443,"/samlsso"));
         nonSamlPostRequestMessage.setRequestBody(new HttpRequestBody("p=value1&q=value2"));
 
-        samlMessageString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><samlp:AuthnRequest " +
-                "xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\" AssertionConsumerServiceURL=\"http://localhost:8080/ssologin\" AttributeConsumingServiceIndex=\"1239245949\" ForceAuthn=\"false\" ID=\"0\" IsPassive=\"false\" IssueInstant=\"2013-09-01T14:22:20.498Z\" ProtocolBinding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Version=\"2.0\"><samlp:Issuer xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:assertion\">SSOSampleApp</samlp:Issuer><samlp:NameIDPolicy AllowCreate=\"true\" Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\" SPNameQualifier=\"Issuer\"/><samlp:RequestedAuthnContext Comparison=\"exact\"><saml:AuthnContextClassRef xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp:AuthnRequest>";
+        samlMessageString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><samlp:AuthnRequest xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\" AssertionConsumerServiceURL=\"http://localhost:8080/ssologin\" AttributeConsumingServiceIndex=\"1239245949\" ForceAuthn=\"false\" ID=\"0\" IsPassive=\"false\" IssueInstant=\"2013-09-01T14:22:20.498Z\" ProtocolBinding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Version=\"2.0\">\n" +
+                "    <samlp:Issuer xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:assertion\">SSOSampleApp</samlp:Issuer>\n" +
+                "    <samlp:NameIDPolicy AllowCreate=\"true\" Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\" SPNameQualifier=\"Issuer\"/>\n" +
+                "    <samlp:RequestedAuthnContext Comparison=\"exact\">\n" +
+                "        <saml:AuthnContextClassRef xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>\n" +
+                "    </samlp:RequestedAuthnContext>\n" +
+                "</samlp:AuthnRequest>";
     }
 
     private static void initConfigurations() throws SAMLException {
