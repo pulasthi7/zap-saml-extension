@@ -9,6 +9,7 @@ import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -177,6 +178,14 @@ public class SAMLMessage {
                         ((Attr) node).setValue(attribute.getValue().toString());
                     } else {
                         node.setNodeValue(attribute.getValue().toString());
+                    }
+                }
+
+                if(SAMLConfiguration.getConfigurations().getXSWEnabled()){
+                    NodeList nodeList = (NodeList) xpath.compile("//signature").evaluate(xmlDocument, XPathConstants.NODESET);
+                    for (int i = 0; i < nodeList.getLength(); i++) {
+                        Node item = nodeList.item(i);
+                        item.getParentNode().removeChild(item);
                     }
                 }
             } catch (XPathExpressionException e) {
