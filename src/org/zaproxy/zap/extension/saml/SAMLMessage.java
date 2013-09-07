@@ -185,7 +185,9 @@ public class SAMLMessage {
                     NodeList nodeList = (NodeList) xpath.compile("//signature").evaluate(xmlDocument, XPathConstants.NODESET);
                     for (int i = 0; i < nodeList.getLength(); i++) {
                         Node item = nodeList.item(i);
-                        item.getParentNode().removeChild(item);
+                        if(item instanceof Element){
+                            item.getParentNode().removeChild(item);
+                        }
                     }
                 }
             } catch (XPathExpressionException e) {
