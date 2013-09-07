@@ -9,7 +9,6 @@ import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -180,18 +179,21 @@ public class SAMLMessage {
                         node.setNodeValue(attribute.getValue().toString());
                     }
                 }
-
-                if(SAMLConfiguration.getConfigurations().getXSWEnabled()){
-                    NodeList nodeList = (NodeList) xpath.compile("//signature").evaluate(xmlDocument, XPathConstants.NODESET);
-                    for (int i = 0; i < nodeList.getLength(); i++) {
-                        Node item = nodeList.item(i);
-                        if(item instanceof Element){
-                            item.getParentNode().removeChild(item);
-                        }
+            } catch (XPathExpressionException e) {
+                log.warn(attribute.getxPath() + " is not a valid XPath", e);
+            }
+        }
+        if(SAMLConfiguration.getConfigurations().getXSWEnabled()){
+            try {
+                NodeList nodeList = (NodeList) xpath.compile("/Response//Signature").evaluate(xmlDocument, XPathConstants.NODESET);
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Node item = nodeList.item(i);
+                    if(item instanceof Element){
+                        item.getParentNode().removeChild(item);
                     }
                 }
             } catch (XPathExpressionException e) {
-                log.warn(attribute.getxPath() + " is not a valid XPath", e);
+                log.warn("'/Response//Signature' is not a valid XPath", e);
             }
         }
     }
@@ -272,7 +274,12 @@ public class SAMLMessage {
     public boolean changeAttributeValueTo(String attributeName, String value){
         if(attributeMap.containsKey(attributeName)){
             Attribute attribute = attributeMap.get(attributeName);
-            Object newValue = validateValueType(attribute.getValueType(), value);
+            Object newValue;
+            if(SAMLConfiguration.getConfigurations().isValidationEnabled()){
+                newValue = validateValueType(attribute.getValueType(), value);
+            } else {
+                newValue = value;
+            }
             if(newValue!=null){
                 attribute.setValue(newValue);
                 messageChanged = true;
