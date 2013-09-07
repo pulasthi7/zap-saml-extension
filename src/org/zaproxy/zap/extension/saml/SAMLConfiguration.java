@@ -83,6 +83,14 @@ public class SAMLConfiguration {
         configData.setXswEnabled(value);
     }
 
+    public boolean isValidationEnabled(){
+        return configData.isValidationEnabled();
+    }
+
+    public void setValidationEnabled(boolean value){
+        configData.setValidationEnabled(value);
+    }
+
     public boolean saveConfiguration(){
         try {
             JAXBContext context = JAXBContext.newInstance(SAMLConfigData.class);

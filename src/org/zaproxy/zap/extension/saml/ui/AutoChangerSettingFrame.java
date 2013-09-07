@@ -13,10 +13,13 @@ import java.util.Set;
 
 public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeChangeListener {
 
-    private JScrollPane attributeScrollPane;
+    private JScrollPane settingsScrollPane;
     private Set<Attribute> attributeSet;
+    JCheckBox chckbxEnablePassiveChanger;
+    JCheckBox chckbxRemoveMessageSignatures;
+    JCheckBox chckbxValidateAttributeValue;
 
-	/**
+    /**
 	 * Create the frame.
 	 */
 	public AutoChangerSettingFrame(final SAMLProxyListener listener) {
@@ -32,8 +35,8 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
 		JLabel lblHeaderlabel = new JLabel("<html><h2>SAML Settings</h2></html>");
 		contentPane.add(lblHeaderlabel, BorderLayout.NORTH);
 		
-		attributeScrollPane = new JScrollPane();
-        contentPane.add(attributeScrollPane, BorderLayout.CENTER);
+		settingsScrollPane = new JScrollPane();
+        contentPane.add(settingsScrollPane, BorderLayout.CENTER);
 		
 
 
@@ -56,16 +59,20 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
         btnSaveChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SAMLConfiguration.getConfigurations().getAutoChangeAttributes().clear();
-                SAMLConfiguration.getConfigurations().getAutoChangeAttributes().addAll(attributeSet);
+                SAMLConfiguration samlConfiguration = SAMLConfiguration.getConfigurations();
+                samlConfiguration.getAutoChangeAttributes().clear();
+                samlConfiguration.getAutoChangeAttributes().addAll(attributeSet);
                 listener.loadAutoChangeAttributes();
-                boolean success = SAMLConfiguration.getConfigurations().saveConfiguration();
+                samlConfiguration.setAutochangeEnabled(chckbxEnablePassiveChanger.isSelected());
+                samlConfiguration.setXSWEnabled(chckbxRemoveMessageSignatures.isSelected());
+                samlConfiguration.setValidationEnabled(chckbxValidateAttributeValue.isSelected());
+                boolean success = samlConfiguration.saveConfiguration();
                 if(success){
-                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
+                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Success",
                             JOptionPane.INFORMATION_MESSAGE);
                 } else{
-                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Sucess",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Could not save changes. Please retry",
+                            "Failed", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -106,18 +113,33 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
     }
 
     private void initAttributes(){
+        JPanel settingsPanel = new JPanel();
+        settingsScrollPane.setViewportView(settingsPanel);
+        settingsPanel.setLayout(new GridLayout(0, 1, 5, 15));
+        
+        JPanel globalSettingsPanel = new JPanel();
+        globalSettingsPanel.setBorder(new TitledBorder(null, "Global Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        settingsPanel.add(globalSettingsPanel);
+        globalSettingsPanel.setLayout(new BoxLayout(globalSettingsPanel, BoxLayout.Y_AXIS));
+
+        SAMLConfiguration configuration = SAMLConfiguration.getConfigurations();
+        chckbxEnablePassiveChanger = new JCheckBox("Enable Passive changer");
+        chckbxEnablePassiveChanger.setSelected(configuration.getAutoChangeEnabled());
+        globalSettingsPanel.add(chckbxEnablePassiveChanger);
+
+        chckbxRemoveMessageSignatures = new JCheckBox("Remove message signatures");
+        chckbxRemoveMessageSignatures.setSelected(configuration.getXSWEnabled());
+        globalSettingsPanel.add(chckbxRemoveMessageSignatures);
+        
+        chckbxValidateAttributeValue = new JCheckBox("Validate attribute value types");
+        chckbxValidateAttributeValue.setSelected(configuration.isValidationEnabled());
+        globalSettingsPanel.add(chckbxValidateAttributeValue);
         JPanel attributePanel = new JPanel();
-        attributeScrollPane.setViewportView(attributePanel);
-        attributePanel.setLayout(new GridLayout(Math.max(attributeSet.size()+1,15), 1, 5, 0));
-        attributePanel.setBorder(new TitledBorder("SAML Attributes to be changed automatically"));
-        JPanel panel = new JPanel();
-        attributePanel.add(panel);
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        JLabel lblHeader = new JLabel("<html><p>Following attributes will be changed to the given values " +
-                "automatically. Add/Edit the attributes and values below </p></html>");
-        panel.add(lblHeader);
+        attributePanel.setBorder(new TitledBorder(null, "Auto Change Attributes and Values", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        settingsPanel.add(attributePanel);
+        attributePanel.setLayout(new GridLayout(10, 1, 0, 5));
         for (final Attribute attribute : attributeSet) {
-            panel = new JPanel();
+            JPanel panel = new JPanel();
             attributePanel.add(panel);
             panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 

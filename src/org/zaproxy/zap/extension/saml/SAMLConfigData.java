@@ -10,6 +10,7 @@ import java.util.Set;
 public class SAMLConfigData {
     private boolean autoChangerEnabled;
     private boolean xswEnabled;
+    private boolean validationEnabled;
 
    private Set<Attribute> availableAttributes;
 
@@ -55,5 +56,13 @@ public class SAMLConfigData {
 
     public void setXswEnabled(boolean xswEnabled) {
         this.xswEnabled = xswEnabled;
+    }
+
+    public boolean isValidationEnabled() {
+        return validationEnabled;
+    }
+
+    public void setValidationEnabled(boolean validationEnabled) {
+        this.validationEnabled = validationEnabled;
     }
 }
