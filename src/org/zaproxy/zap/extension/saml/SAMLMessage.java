@@ -354,10 +354,10 @@ public class SAMLMessage {
     }
 
     public void setSamlMessageString(String samlMessageString) {
-        samlMessageString = samlMessageString.trim().replaceAll("\n","").replaceAll("\\s+"," ");
-        if(!this.samlMessageString.equals(samlMessageString)){
+        String trimmedMessage = samlMessageString.trim().replaceAll("\n","").replaceAll("\\s+"," ");
+        if(!this.samlMessageString.equals(trimmedMessage)){
             String oldValue = this.samlMessageString;
-            this.samlMessageString = samlMessageString;
+            this.samlMessageString = trimmedMessage;
             try {
                 buildXMLDocument();
                 buildAttributeMap();
