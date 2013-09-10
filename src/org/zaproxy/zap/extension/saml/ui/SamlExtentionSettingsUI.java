@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeChangeListener {
+public class SamlExtentionSettingsUI extends JFrame implements DesiredAttributeChangeListener {
 
     private JScrollPane settingsScrollPane;
     private Set<Attribute> attributeSet;
@@ -22,7 +22,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
     /**
 	 * Create the frame.
 	 */
-	public AutoChangerSettingFrame(final SAMLProxyListener listener) {
+	public SamlExtentionSettingsUI(final SAMLProxyListener listener) {
 		setTitle("SAML Automatic Request Changer Settings");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(800, 700);
@@ -48,7 +48,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AddNewAttributeDialog dialog = new AddNewAttributeDialog(AutoChangerSettingFrame.this);
+                AddNewAttributeDialog dialog = new AddNewAttributeDialog(SamlExtentionSettingsUI.this);
                 dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                 dialog.setVisible(true);
             }
@@ -68,10 +68,10 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
                 samlConfiguration.setValidationEnabled(chckbxValidateAttributeValue.isSelected());
                 boolean success = samlConfiguration.saveConfiguration();
                 if(success){
-                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Changes saved","Success",
+                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this,"Changes saved","Success",
                             JOptionPane.INFORMATION_MESSAGE);
                 } else{
-                    JOptionPane.showMessageDialog(AutoChangerSettingFrame.this,"Could not save changes. Please retry",
+                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this,"Could not save changes. Please retry",
                             "Failed", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -92,7 +92,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AutoChangerSettingFrame.this.setVisible(false);
+                SamlExtentionSettingsUI.this.setVisible(false);
             }
         });
 		footerPanel.add(btnExit);
@@ -115,7 +115,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
     private void initAttributes(){
         JPanel settingsPanel = new JPanel();
         settingsScrollPane.setViewportView(settingsPanel);
-        settingsPanel.setLayout(new GridLayout(0, 1, 5, 15));
+        settingsPanel.setLayout(new GridLayout(2, 1, 5, 15));
         
         JPanel globalSettingsPanel = new JPanel();
         globalSettingsPanel.setBorder(new TitledBorder(null, "Global Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -137,7 +137,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
         JPanel attributePanel = new JPanel();
         attributePanel.setBorder(new TitledBorder(null, "Auto Change Attributes and Values", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         settingsPanel.add(attributePanel);
-        attributePanel.setLayout(new GridLayout(10, 1, 0, 5));
+        attributePanel.setLayout(new GridLayout(Math.max(10,attributeSet.size()), 1, 0, 5));
         for (final Attribute attribute : attributeSet) {
             JPanel panel = new JPanel();
             attributePanel.add(panel);
@@ -160,7 +160,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
             btnAddeditValues.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    AddNewAttributeDialog editDialog = new AddNewAttributeDialog(AutoChangerSettingFrame.this);
+                    AddNewAttributeDialog editDialog = new AddNewAttributeDialog(SamlExtentionSettingsUI.this);
                     editDialog.getComboBoxAttribSelect().removeAllItems();
                     editDialog.getComboBoxAttribSelect().addItem(attribute);
                     editDialog.getTxtAttribValues().setText(attribute.getValue().toString().replaceAll(",", "\n"));
@@ -173,7 +173,7 @@ public class AutoChangerSettingFrame extends JFrame implements DesiredAttributeC
             btnRemoveAttribute.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int response = JOptionPane.showConfirmDialog(AutoChangerSettingFrame.this,
+                    int response = JOptionPane.showConfirmDialog(SamlExtentionSettingsUI.this,
                             "Are you sure to remove the attribute","Confirm",JOptionPane.YES_NO_OPTION);
                     if(response == JOptionPane.YES_OPTION){
                         onDeleteDesiredAttribute(attribute);
