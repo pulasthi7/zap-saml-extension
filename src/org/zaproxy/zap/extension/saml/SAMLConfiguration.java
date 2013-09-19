@@ -17,7 +17,6 @@ public class SAMLConfiguration {
     private static final String SAML_CONF_FILE = "zap_saml_conf.xml";
     private static SAMLConfiguration configuration = new SAMLConfiguration();
 
-    private boolean initialized;
     private SAMLConfigData configData;
 
     protected final static Logger log = Logger.getLogger(SAMLConfiguration.class);
@@ -62,7 +61,6 @@ public class SAMLConfiguration {
 
         //load the configuration
         configData = (SAMLConfigData) loadXMLObject(SAMLConfigData.class,confFile);
-        initialized = true;
     }
 
     /**

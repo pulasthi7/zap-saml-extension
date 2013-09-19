@@ -34,13 +34,10 @@ public class AddNewAttributeDialog extends JDialog {
 			{
                 attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
 				comboBoxAttribSelect = new JComboBox<>();
-                try {
-                    for (Attribute attribute : SAMLConfiguration.getConfigurations().getAvailableAttributes()) {
-                        if(!listener.getDesiredAttributes().contains(attribute)){
-                            comboBoxAttribSelect.addItem((Attribute) attribute.clone());
-                        }
+                for (Attribute attribute : SAMLConfiguration.getConfigurations().getAvailableAttributes()) {
+                    if(!listener.getDesiredAttributes().contains(attribute)){
+                        comboBoxAttribSelect.addItem(attribute.createCopy());
                     }
-                } catch (CloneNotSupportedException ignored) {
                 }
                 comboBoxAttribSelect.setMaximumRowCount(5);
 				attribNamePanel.add(comboBoxAttribSelect);

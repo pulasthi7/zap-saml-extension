@@ -12,7 +12,7 @@ public class SAMLConfigData {
     private boolean xswEnabled;
     private boolean validationEnabled;
 
-   private Set<Attribute> availableAttributes;
+    private Set<Attribute> availableAttributes;
 
     private Set<Attribute> autoChangeValues;
 
