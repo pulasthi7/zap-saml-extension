@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class SAMLMessage {
 
-    protected static Logger log = Logger.getLogger(SAMLMessage.class);
+    protected static final Logger log = Logger.getLogger(SAMLMessage.class);
     private boolean messageChanged;
     private HttpMessage httpMessage;
     private String samlMessageString;
@@ -127,14 +127,13 @@ public class SAMLMessage {
                         value = node.getNodeValue();
                     }
                     if (value != null && !"".equals(value)) {
-                        Attribute newAttrib = (Attribute) attribute.clone();
+                        Attribute newAttrib = attribute.createCopy();
                         newAttrib.setValue(value);
                         attributeMap.put(attribute.getName(), newAttrib);
                     }
                 }
             } catch (XPathExpressionException e) {
                 log.warn(attribute.getxPath() + " is not a valid XPath", e);
-            } catch (CloneNotSupportedException ignored) {
             }
         }
     }

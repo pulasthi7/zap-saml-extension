@@ -102,13 +102,10 @@ public class SamlExtentionSettingsUI extends JFrame implements DesiredAttributeC
 
     private void loadAutoChangeAttributes(){
         attributeSet = new LinkedHashSet<>();
-        try {
-            for (Attribute autoChangeAttribute : SAMLConfiguration.getConfigurations().getAutoChangeAttributes()) {
-                Attribute clonedAttribute = (Attribute)autoChangeAttribute.clone();
-                clonedAttribute.setValue(autoChangeAttribute.getValue());
-                attributeSet.add(clonedAttribute);
-            }
-        } catch (CloneNotSupportedException ignored) {
+        for (Attribute autoChangeAttribute : SAMLConfiguration.getConfigurations().getAutoChangeAttributes()) {
+            Attribute clonedAttribute = autoChangeAttribute.createCopy();
+            clonedAttribute.setValue(autoChangeAttribute.getValue());
+            attributeSet.add(clonedAttribute);
         }
     }
 
