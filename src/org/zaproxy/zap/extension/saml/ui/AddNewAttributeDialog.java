@@ -17,7 +17,7 @@ public class AddNewAttributeDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public AddNewAttributeDialog(final DesiredAttributeChangeListener listener) {
+	public AddNewAttributeDialog(final AttributeChangeListener listener) {
         setTitle("Add New Attribute");
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());

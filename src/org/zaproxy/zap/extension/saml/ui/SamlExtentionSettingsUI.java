@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class SamlExtentionSettingsUI extends JFrame implements DesiredAttributeChangeListener {
+public class SamlExtentionSettingsUI extends JFrame implements AttributeChangeListener {
 
     private JScrollPane settingsScrollPane;
     private Set<Attribute> attributeSet;
