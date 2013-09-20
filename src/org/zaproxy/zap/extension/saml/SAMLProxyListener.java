@@ -14,9 +14,14 @@ public class SAMLProxyListener implements ProxyListener {
     protected final static Logger log = Logger.getLogger(SAMLProxyListener.class.getName());
 
     public SAMLProxyListener() {
-        setActive(SAMLConfiguration.getConfigurations().getAutoChangeEnabled());
+        setActive(SAMLConfiguration.getInstance().getAutoChangeEnabled());
     }
 
+    /**
+     * Activate/Deactivate the passive listner. If deactivated the requests will be unchanged even the attributes to
+     * be changed, exists in the message
+     * @param value
+     */
     public void setActive(boolean value) {
         active = value;
         if (active && autoChangeAttribs == null) {
@@ -63,7 +68,10 @@ public class SAMLProxyListener implements ProxyListener {
         return 0;
     }
 
+    /**
+     * Load the attributes and values to change automatically if they are found in a message
+     */
     public void loadAutoChangeAttributes() {
-        autoChangeAttribs = SAMLConfiguration.getConfigurations().getAutoChangeAttributes();
+        autoChangeAttribs = SAMLConfiguration.getInstance().getAutoChangeAttributes();
     }
 }

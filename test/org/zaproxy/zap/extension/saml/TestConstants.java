@@ -74,7 +74,7 @@ public class TestConstants {
     }
 
     private static void initConfigurations() throws SAMLException {
-        testConfigutations = SAMLConfiguration.getConfigurations();
+        testConfigutations = SAMLConfiguration.getInstance();
         testConfigutations.initialize(TestConstants.class.getResource("zap_saml_conf.xml").getFile());
     }
 }

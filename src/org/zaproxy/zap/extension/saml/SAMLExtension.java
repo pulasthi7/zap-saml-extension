@@ -37,7 +37,7 @@ public class SAMLExtension extends ExtensionAdaptor {
         super.hook(extensionHook);
 
         try {
-            SAMLConfiguration conf = SAMLConfiguration.getConfigurations();
+            SAMLConfiguration conf = SAMLConfiguration.getInstance();
             if (conf != null) {
                 conf.initialize();
             } else {

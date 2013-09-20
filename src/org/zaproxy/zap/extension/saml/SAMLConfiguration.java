@@ -21,7 +21,11 @@ public class SAMLConfiguration implements AttributeListener {
 
     protected final static Logger log = Logger.getLogger(SAMLConfiguration.class);
 
-    public static SAMLConfiguration getConfigurations() {
+    /**
+     * Get the singleton configurations object
+     * @return
+     */
+    public static SAMLConfiguration getInstance() {
         return configuration;
     }
 

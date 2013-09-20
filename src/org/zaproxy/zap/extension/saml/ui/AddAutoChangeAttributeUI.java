@@ -34,7 +34,7 @@ public class AddAutoChangeAttributeUI extends JDialog {
             {
                 attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
                 comboBoxAttribSelect = new JComboBox<>();
-                for (Attribute attribute : SAMLConfiguration.getConfigurations().getAvailableAttributes()) {
+                for (Attribute attribute : SAMLConfiguration.getInstance().getAvailableAttributes()) {
                     if (!listener.getDesiredAttributes().contains(attribute)) {
                         comboBoxAttribSelect.addItem(attribute.createCopy());
                     }

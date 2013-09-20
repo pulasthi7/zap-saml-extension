@@ -68,7 +68,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         btnSaveChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SAMLConfiguration samlConfiguration = SAMLConfiguration.getConfigurations();
+                SAMLConfiguration samlConfiguration = SAMLConfiguration.getInstance();
                 samlConfiguration.getAutoChangeAttributes().clear();
                 samlConfiguration.getAutoChangeAttributes().addAll(attributeSet);
                 listener.loadAutoChangeAttributes();
@@ -109,15 +109,21 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         initAttributes();
     }
 
+    /**
+     * Load the auto change attributes
+     */
     private void loadAutoChangeAttributes() {
         attributeSet = new LinkedHashSet<>();
-        for (Attribute autoChangeAttribute : SAMLConfiguration.getConfigurations().getAutoChangeAttributes()) {
+        for (Attribute autoChangeAttribute : SAMLConfiguration.getInstance().getAutoChangeAttributes()) {
             Attribute clonedAttribute = autoChangeAttribute.createCopy();
             clonedAttribute.setValue(autoChangeAttribute.getValue());
             attributeSet.add(clonedAttribute);
         }
     }
 
+    /**
+     * Initialize UI with the attributes
+     */
     private void initAttributes() {
         JPanel settingsPanel = new JPanel();
         settingsScrollPane.setViewportView(settingsPanel);
@@ -144,7 +150,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridx = 0;
 
-        SAMLConfiguration configuration = SAMLConfiguration.getConfigurations();
+        SAMLConfiguration configuration = SAMLConfiguration.getInstance();
         chckbxEnablePassiveChanger = new JCheckBox("Enable Passive changer");
         chckbxEnablePassiveChanger.setSelected(configuration.getAutoChangeEnabled());
         globalSettingsPanel.add(chckbxEnablePassiveChanger, gridBagConstraints);
@@ -221,7 +227,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         allAttributePanel.setLayout(new GridBagLayout());
 
         gridBagConstraints.gridy = 0;
-        for (final Attribute attribute : SAMLConfiguration.getConfigurations().getAvailableAttributes()) {
+        for (final Attribute attribute : SAMLConfiguration.getInstance().getAvailableAttributes()) {
             gridBagConstraints.gridx = 0;
 
             final JLabel lblAttribute = new JLabel(attribute.getViewName());
@@ -273,13 +279,13 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
 
     @Override
     public void onAttributeAdd(Attribute a) {
-        SAMLConfiguration.getConfigurations().onAttributeAdd(a);
+        SAMLConfiguration.getInstance().onAttributeAdd(a);
         initAttributes();
     }
 
     @Override
     public void onAttributeDelete(Attribute a) {
-        SAMLConfiguration.getConfigurations().onAttributeDelete(a);
+        SAMLConfiguration.getInstance().onAttributeDelete(a);
         initAttributes();
     }
 }

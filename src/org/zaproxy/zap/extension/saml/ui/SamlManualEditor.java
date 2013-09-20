@@ -118,6 +118,9 @@ public class SamlManualEditor extends JFrame {
         updateFields();
     }
 
+    /**
+     * Update the UI fields with the new values. To be called on value changes
+     */
     private void updateFields() {
         msgPane = new JTextPane();
         msgScrollPane.setViewportView(msgPane);
@@ -204,6 +207,10 @@ public class SamlManualEditor extends JFrame {
         }
     }
 
+    /**
+     * Update the response
+     * @param msg
+     */
     private void updateResponse(HttpMessage msg) {
         respBodyTextPane.setText(msg.getResponseBody().createCachedString("UTF-8"));
         respHeadTextPane.setText(msg.getResponseHeader().toString());
