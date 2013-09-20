@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Set;
 
-public class SAMLConfiguration {
+public class SAMLConfiguration implements AttributeListener{
 
     private static final String SAML_CONF_FILE = "zap_saml_conf.xml";
     private static SAMLConfiguration configuration = new SAMLConfiguration();
@@ -167,5 +167,21 @@ public class SAMLConfiguration {
         } catch (JAXBException e) {
             throw new SAMLException("XML loading failed",e);
         }
+    }
+
+    @Override
+    public void onAttributeAdd(Attribute a) {
+        configData.getAvailableAttributes().add(a);
+    }
+
+    @Override
+    public void onAttributeDelete(Attribute a) {
+        Attribute attributeToDelete = null;
+        for (Attribute attribute : configData.getAvailableAttributes()) {
+            if(attribute.getName().equals(a.getName())){
+                attributeToDelete = attribute;
+            }
+        }
+        configData.getAvailableAttributes().remove(attributeToDelete);
     }
 }

@@ -2,7 +2,7 @@ package org.zaproxy.zap.extension.saml;
 
 import java.util.Set;
 
-public interface AttributeChangeListener {
+public interface PassiveAttributeChangeListener {
     void onDesiredAttributeValueChange(Attribute attribute);
     void onAddDesiredAttribute(Attribute attribute);
     void onDeleteDesiredAttribute(Attribute attribute);

@@ -7,7 +7,7 @@ import org.parosproxy.paros.network.HttpMessage;
 import static org.junit.Assert.*;
 
 
-public class SAMLMessageIntegrationTest {
+public class SAMLMessageUnitTest {
 
     @Before
     public void setUp() throws Exception {
@@ -40,12 +40,14 @@ public class SAMLMessageIntegrationTest {
     public void shouldReturnNullForNonSamlGetRequests() throws Exception {
         HttpMessage getRequestMessage = TestConstants.nonSamlGetRequestMessage;
         SAMLMessage message = new SAMLMessage(getRequestMessage);
+        assertNull(message);
     }
 
     @Test(expected = SAMLException.class)
     public void shouldReturnNullForNonSamlPostRequests() throws Exception {
         HttpMessage postRequestMessage = TestConstants.nonSamlPostRequestMessage;
         SAMLMessage message = new SAMLMessage(postRequestMessage);
+        assertNull(message);
     }
 
     @Test

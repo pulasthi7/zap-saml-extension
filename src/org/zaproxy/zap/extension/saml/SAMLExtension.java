@@ -53,7 +53,7 @@ public class SAMLExtension extends ExtensionAdaptor {
                 samlMenu.add(samlResendMenuItem);
                 extensionHook.getHookMenu().addPopupMenuItem(samlMenu);
 
-                JMenuItem samlActiveEditorMenu = new JMenuItem("SAML Request Editor");
+                JMenuItem samlActiveEditorMenu = new JMenuItem("SAML Settings");
                 samlActiveEditorMenu.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

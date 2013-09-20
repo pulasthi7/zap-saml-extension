@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AddNewAttributeDialog extends JDialog {
+public class AddAutoChangeAttributeUI extends JDialog {
 
     private JComboBox<Attribute> comboBoxAttribSelect;
     private JTextField txtAttribValues;
@@ -17,9 +17,9 @@ public class AddNewAttributeDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public AddNewAttributeDialog(final AttributeChangeListener listener) {
+	public AddAutoChangeAttributeUI(final PassiveAttributeChangeListener listener) {
         setTitle("Add New Attribute");
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 250);
 		getContentPane().setLayout(new BorderLayout());
         JPanel contentPanel = new JPanel();
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -74,14 +74,14 @@ public class AddNewAttributeDialog extends JDialog {
                             return;
                         }
                         if(txtAttribValues.getText().equals("")){
-                            JOptionPane.showMessageDialog(AddNewAttributeDialog.this,"No values given, " +
+                            JOptionPane.showMessageDialog(AddAutoChangeAttributeUI.this,"No values given, " +
                                     "Please provide a non-empty value","Error in value", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                         Attribute attribute = ((Attribute)comboBoxAttribSelect.getSelectedItem());
                         attribute.setValue(txtAttribValues.getText());
                         listener.onDesiredAttributeValueChange(attribute);
-                        AddNewAttributeDialog.this.setVisible(false);
+                        AddAutoChangeAttributeUI.this.setVisible(false);
                     }
                 });
 				buttonPane.add(okButton);
@@ -92,7 +92,7 @@ public class AddNewAttributeDialog extends JDialog {
 				cancelButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        AddNewAttributeDialog.this.setVisible(false);
+                        AddAutoChangeAttributeUI.this.setVisible(false);
                     }
                 });
 				buttonPane.add(cancelButton);
