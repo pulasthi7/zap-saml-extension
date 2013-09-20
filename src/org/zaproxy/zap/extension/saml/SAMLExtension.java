@@ -38,12 +38,12 @@ public class SAMLExtension extends ExtensionAdaptor {
 
         try {
             SAMLConfiguration conf = SAMLConfiguration.getConfigurations();
-            if(conf!=null){
+            if (conf != null) {
                 conf.initialize();
             } else {
                 log.error("SAML Configuration can't be loaded. Extention will not be loaded...");
             }
-            if (getView() != null && conf!=null) {
+            if (getView() != null && conf != null) {
                 final SAMLProxyListener proxyListener = new SAMLProxyListener();
                 extensionHook.addProxyListener(proxyListener);
 

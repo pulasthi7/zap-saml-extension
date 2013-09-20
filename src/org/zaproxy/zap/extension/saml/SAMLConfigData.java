@@ -27,7 +27,7 @@ public class SAMLConfigData {
     @XmlElementWrapper(name = "AllAttributes")
     @XmlElement(name = "Attribute")
     public Set<Attribute> getAvailableAttributes() {
-        if(availableAttributes==null){
+        if (availableAttributes == null) {
             availableAttributes = new LinkedHashSet<>();
         }
         return availableAttributes;
@@ -38,7 +38,7 @@ public class SAMLConfigData {
     }
 
     public Set<Attribute> getAutoChangeValues() {
-        if(autoChangeValues==null){
+        if (autoChangeValues == null) {
             autoChangeValues = new LinkedHashSet<>();
         }
         return autoChangeValues;

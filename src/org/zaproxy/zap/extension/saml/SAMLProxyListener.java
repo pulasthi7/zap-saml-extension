@@ -34,14 +34,14 @@ public class SAMLProxyListener implements ProxyListener {
                 for (Attribute attribute : autoChangeAttribs) {
                     String value = attribute.getValue().toString();
                     boolean changed = samlMessage.changeAttributeValueTo(attribute.getName(), value);
-                    if(changed){
-                        log.debug(attribute.getName()+": value changed to "+value);
+                    if (changed) {
+                        log.debug(attribute.getName() + ": value changed to " + value);
                     }
                 }
 
                 //change the original message
                 HttpMessage changedMessege = samlMessage.getChangedMessage();
-                if(changedMessege!=message){
+                if (changedMessege != message) {
                     //check for reference, if they are same the message is already changed,
                     // else the header and body are changed
                     message.setRequestBody(changedMessege.getRequestBody());

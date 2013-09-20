@@ -60,7 +60,7 @@ public class Attribute {
         this.value = value;
     }
 
-    public Attribute createCopy(){
+    public Attribute createCopy() {
         Attribute attribute = new Attribute();
         attribute.setxPath(xPath);
         attribute.setName(name);

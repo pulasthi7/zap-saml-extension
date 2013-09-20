@@ -4,7 +4,10 @@ import java.util.Set;
 
 public interface PassiveAttributeChangeListener {
     void onDesiredAttributeValueChange(Attribute attribute);
+
     void onAddDesiredAttribute(Attribute attribute);
+
     void onDeleteDesiredAttribute(Attribute attribute);
+
     Set<Attribute> getDesiredAttributes();
 }
