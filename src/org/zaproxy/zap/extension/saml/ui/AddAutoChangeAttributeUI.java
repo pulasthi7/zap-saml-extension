@@ -33,7 +33,7 @@ public class AddAutoChangeAttributeUI extends JDialog {
         c.weightx = 0.5;
         c.gridx = 0;
         c.gridy = 0;
-        c.insets = new Insets(10,0,10,0);
+        c.insets = new Insets(10,0,0,0);
 
         contentPanel.add(lblName,c);
 
