@@ -14,12 +14,17 @@ public class AddAutoChangeAttributeUI extends JDialog {
     private JComboBox<Attribute> comboBoxAttribSelect;
     private JTextField txtAttribValues;
 
+    public static void main(String[] args) {
+        AddAutoChangeAttributeUI ui = new AddAutoChangeAttributeUI(null);
+        ui.setVisible(true);
+    }
+
     /**
      * Create the dialog.
      */
     public AddAutoChangeAttributeUI(final PassiveAttributeChangeListener listener) {
         setTitle(SamlI18n.getMessage("saml.addchangeattrib.header"));
-        setBounds(100, 100, 450, 250);
+        setBounds(100, 100, 450, 150);
         getContentPane().setLayout(new BorderLayout());
         JPanel contentPanel = new JPanel();
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -76,9 +81,9 @@ public class AddAutoChangeAttributeUI extends JDialog {
                             JOptionPane.showMessageDialog(AddAutoChangeAttributeUI.this, SamlI18n.getMessage("saml.addchangeattrib.msg.novalue"), SamlI18n.getMessage("saml.addchangeattrib.msg.valueerror"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
-                        Attribute attribute = ((Attribute) comboBoxAttribSelect.getSelectedItem());
+                        Attribute attribute = ((Attribute) comboBoxAttribSelect.getSelectedItem()).createCopy();
                         attribute.setValue(txtAttribValues.getText());
-                        listener.onDesiredAttributeValueChange(attribute);
+                        listener.onAddDesiredAttribute(attribute);
                         AddAutoChangeAttributeUI.this.setVisible(false);
                     }
                 });

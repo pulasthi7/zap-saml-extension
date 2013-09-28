@@ -24,7 +24,6 @@ public interface PassiveAttributeChangeListener {
 
     /**
      * Get the current auto change attributes
-     * @param attribute
      */
     Set<Attribute> getDesiredAttributes();
 }

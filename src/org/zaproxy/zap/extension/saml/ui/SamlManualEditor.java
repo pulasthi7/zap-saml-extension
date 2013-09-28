@@ -127,7 +127,7 @@ public class SamlManualEditor extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 samlMessage.setSamlMessageString(msgPane.getText());
-                //todo check for validity
+                //todo: check for validity
                 updateFields();
             }
         });

@@ -13,7 +13,7 @@ public class SamlI18n {
     }
 
     public static String getMessage(String key) {
-        if (key != null && message.containsKey(key)) {
+        if (key != null && message!=null && message.containsKey(key)) {
             return message.getString(key);
         }
         return "";
