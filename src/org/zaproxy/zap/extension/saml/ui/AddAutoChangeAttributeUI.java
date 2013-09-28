@@ -18,7 +18,7 @@ public class AddAutoChangeAttributeUI extends JDialog {
      * Create the dialog.
      */
     public AddAutoChangeAttributeUI(final PassiveAttributeChangeListener listener) {
-        setTitle("Add New Attribute");
+        setTitle(SamlI18n.getMessage("saml.addchangeattrib.header"));
         setBounds(100, 100, 450, 250);
         getContentPane().setLayout(new BorderLayout());
         JPanel contentPanel = new JPanel();
@@ -32,7 +32,7 @@ public class AddAutoChangeAttributeUI extends JDialog {
             flowLayout.setAlignment(FlowLayout.LEFT);
             contentPanel.add(attribNamePanel, BorderLayout.NORTH);
             {
-                attribNamePanel.setBorder(BorderFactory.createTitledBorder("Attribute Name"));
+                attribNamePanel.setBorder(BorderFactory.createTitledBorder(SamlI18n.getMessage("saml.addchangeattrib.attribname")));
                 comboBoxAttribSelect = new JComboBox<>();
                 for (Attribute attribute : SAMLConfiguration.getInstance().getAvailableAttributes()) {
                     if (!listener.getDesiredAttributes().contains(attribute)) {
@@ -48,7 +48,7 @@ public class AddAutoChangeAttributeUI extends JDialog {
             contentPanel.add(attribValuesPanel, BorderLayout.CENTER);
             attribValuesPanel.setLayout(new BorderLayout(5, 5));
             {
-                JLabel lblAttributeValues = new JLabel("Attribute Values");
+                JLabel lblAttributeValues = new JLabel(SamlI18n.getMessage("saml.addchangeattrib.attribvalue"));
                 lblAttributeValues.setHorizontalAlignment(SwingConstants.LEFT);
                 attribValuesPanel.add(lblAttributeValues, BorderLayout.NORTH);
             }
@@ -64,18 +64,16 @@ public class AddAutoChangeAttributeUI extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
-                final JButton okButton = new JButton("OK");
+                final JButton okButton = new JButton(SamlI18n.getMessage("saml.addchangeattrib.btn.ok"));
                 okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (comboBoxAttribSelect.getSelectedItem() == null) {
-                            View.getSingleton().showWarningDialog("No Attribute selected, " +
-                                    "please select one from combo box");
+                            View.getSingleton().showWarningDialog(SamlI18n.getMessage("saml.addchangeattrib.msg.attribnotselected"));
                             return;
                         }
                         if (txtAttribValues.getText().equals("")) {
-                            JOptionPane.showMessageDialog(AddAutoChangeAttributeUI.this, "No values given, " +
-                                    "Please provide a non-empty value", "Error in value", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(AddAutoChangeAttributeUI.this, SamlI18n.getMessage("saml.addchangeattrib.msg.novalue"), SamlI18n.getMessage("saml.addchangeattrib.msg.valueerror"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                         Attribute attribute = ((Attribute) comboBoxAttribSelect.getSelectedItem());
@@ -88,7 +86,7 @@ public class AddAutoChangeAttributeUI extends JDialog {
                 getRootPane().setDefaultButton(okButton);
             }
             {
-                JButton cancelButton = new JButton("Cancel");
+                JButton cancelButton = new JButton(SamlI18n.getMessage("saml.addchangeattrib.btn.cancel"));
                 cancelButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

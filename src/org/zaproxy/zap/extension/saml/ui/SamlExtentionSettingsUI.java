@@ -23,7 +23,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
      * Create the frame.
      */
     public SamlExtentionSettingsUI(final SAMLProxyListener listener) {
-        setTitle("SAML Settings");
+        setTitle(SamlI18n.getMessage("saml.toolmenu.settings"));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(800, 700);
         setLocationRelativeTo(null);
@@ -32,7 +32,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
 
-        JLabel lblHeaderlabel = new JLabel("<html><h2>SAML Settings</h2></html>");
+        JLabel lblHeaderlabel = new JLabel(SamlI18n.getMessage("saml.settings.header"));
         contentPane.add(lblHeaderlabel, BorderLayout.NORTH);
 
         settingsScrollPane = new JScrollPane();
@@ -42,7 +42,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         contentPane.add(footerPanel, BorderLayout.SOUTH);
         footerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-        JButton btnAddAutoChange = new JButton("Add Auto Change attributes");
+        JButton btnAddAutoChange = new JButton(SamlI18n.getMessage("saml.settings.button.addautochangeattrib"));
         btnAddAutoChange.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -53,7 +53,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         });
         footerPanel.add(btnAddAutoChange);
 
-        JButton btnAdd = new JButton("Add SAML Attributes");
+        JButton btnAdd = new JButton(SamlI18n.getMessage("saml.settings.button.addattrib"));
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -64,7 +64,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         });
         footerPanel.add(btnAdd);
 
-        JButton btnSaveChanges = new JButton("Save Changes");
+        JButton btnSaveChanges = new JButton(SamlI18n.getMessage("saml.settings.button.save"));
         btnSaveChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -77,17 +77,17 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
                 samlConfiguration.setValidationEnabled(chckbxValidateAttributeValue.isSelected());
                 boolean success = samlConfiguration.saveConfiguration();
                 if (success) {
-                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, "Changes saved", "Success",
+                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.settings.messages.saved"), SamlI18n.getMessage("saml.settings.messages.success"),
                             JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, "Could not save changes. Please retry",
-                            "Failed", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.settings.messages.notsaved"), SamlI18n.getMessage("saml.settings.messages.failed"),
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
         footerPanel.add(btnSaveChanges);
 
-        JButton btnResetChanges = new JButton("Reset changes");
+        JButton btnResetChanges = new JButton(SamlI18n.getMessage("saml.settings.button.reset"));
         btnResetChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -97,7 +97,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         });
         footerPanel.add(btnResetChanges);
 
-        JButton btnExit = new JButton("Exit");
+        JButton btnExit = new JButton(SamlI18n.getMessage("saml.settings.button.exit"));
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -137,7 +137,8 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         panelConstraints.gridx = 0;
         panelConstraints.gridy = 0;
         JPanel globalSettingsPanel = new JPanel();
-        globalSettingsPanel.setBorder(new TitledBorder(null, "Global Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        globalSettingsPanel.setBorder(new TitledBorder(null, SamlI18n.getMessage("saml.settings.border.global"),
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
         settingsPanel.add(globalSettingsPanel, panelConstraints);
 
         GridBagLayout settingPanelLayout = new GridBagLayout();
@@ -151,24 +152,24 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         gridBagConstraints.gridx = 0;
 
         SAMLConfiguration configuration = SAMLConfiguration.getInstance();
-        chckbxEnablePassiveChanger = new JCheckBox("Enable Passive changer");
+        chckbxEnablePassiveChanger = new JCheckBox(SamlI18n.getMessage("saml.settings.chkbox.passivechanger"));
         chckbxEnablePassiveChanger.setSelected(configuration.getAutoChangeEnabled());
         globalSettingsPanel.add(chckbxEnablePassiveChanger, gridBagConstraints);
 
         gridBagConstraints.gridy++;
-        chckbxRemoveMessageSignatures = new JCheckBox("Remove message signatures");
+        chckbxRemoveMessageSignatures = new JCheckBox(SamlI18n.getMessage("saml.settings.chkbox.removesign"));
         chckbxRemoveMessageSignatures.setSelected(configuration.getXSWEnabled());
         globalSettingsPanel.add(chckbxRemoveMessageSignatures, gridBagConstraints);
 
         gridBagConstraints.gridy++;
-        chckbxValidateAttributeValue = new JCheckBox("Validate attribute value types");
+        chckbxValidateAttributeValue = new JCheckBox(SamlI18n.getMessage("saml.settings.chkbox.typevalidate"));
         chckbxValidateAttributeValue.setSelected(configuration.isValidationEnabled());
         globalSettingsPanel.add(chckbxValidateAttributeValue, gridBagConstraints);
 
         panelConstraints.gridy++;
         panelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         JPanel attributePanel = new JPanel();
-        attributePanel.setBorder(new TitledBorder(null, "Auto Change Attributes and Values", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        attributePanel.setBorder(new TitledBorder(null, SamlI18n.getMessage("saml.settings.border.autochange"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
         settingsPanel.add(attributePanel, panelConstraints);
         attributePanel.setLayout(new GridBagLayout());
 
@@ -188,7 +189,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
             attributePanel.add(txtValue, gridBagConstraints);
 
             gridBagConstraints.gridx++;
-            JButton btnAddeditValues = new JButton("Add/Edit Values");
+            JButton btnAddeditValues = new JButton(SamlI18n.getMessage("saml.settings.button.editvalue"));
             btnAddeditValues.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -202,12 +203,12 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
             attributePanel.add(btnAddeditValues, gridBagConstraints);
 
             gridBagConstraints.gridx++;
-            JButton btnRemoveAttribute = new JButton("Remove Attribute");
+            JButton btnRemoveAttribute = new JButton(SamlI18n.getMessage("saml.settings.button.removeattrib"));
             btnRemoveAttribute.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int response = JOptionPane.showConfirmDialog(SamlExtentionSettingsUI.this,
-                            "Are you sure to remove the attribute", "Confirm", JOptionPane.YES_NO_OPTION);
+                            SamlI18n.getMessage("saml.settings.messages.confirmremove"), SamlI18n.getMessage("saml.settings.messages.confirm"), JOptionPane.YES_NO_OPTION);
                     if (response == JOptionPane.YES_OPTION) {
                         onDeleteDesiredAttribute(attribute);
                     }
@@ -221,7 +222,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         panelConstraints.weighty = 1.0;
         panelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         JPanel allAttributePanel = new JPanel();
-        allAttributePanel.setBorder(new TitledBorder(null, "Configured Attributes", TitledBorder.LEADING,
+        allAttributePanel.setBorder(new TitledBorder(null, SamlI18n.getMessage("saml.settings.border.attributes"), TitledBorder.LEADING,
                 TitledBorder.TOP, null, null));
         settingsPanel.add(allAttributePanel, panelConstraints);
         allAttributePanel.setLayout(new GridBagLayout());
@@ -238,12 +239,12 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
             allAttributePanel.add(lblAttributeType, gridBagConstraints);
 
             gridBagConstraints.gridx++;
-            JButton btnRemoveAttribute = new JButton("Remove Attribute");
+            JButton btnRemoveAttribute = new JButton(SamlI18n.getMessage("saml.settings.button.removeattrib"));
             btnRemoveAttribute.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int response = JOptionPane.showConfirmDialog(SamlExtentionSettingsUI.this,
-                            "Are you sure to remove the attribute", "Confirm", JOptionPane.YES_NO_OPTION);
+                            SamlI18n.getMessage("saml.settings.messages.confirmremove"), SamlI18n.getMessage("saml.settings.messages.confirm"), JOptionPane.YES_NO_OPTION);
                     if (response == JOptionPane.YES_OPTION) {
                         onAttributeDelete(attribute);
                     }

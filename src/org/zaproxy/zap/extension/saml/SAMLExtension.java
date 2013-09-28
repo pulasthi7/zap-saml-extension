@@ -38,6 +38,7 @@ public class SAMLExtension extends ExtensionAdaptor {
 
         try {
             SAMLConfiguration conf = SAMLConfiguration.getInstance();
+            SamlI18n.init();
             if (conf != null) {
                 conf.initialize();
             } else {
@@ -48,12 +49,12 @@ public class SAMLExtension extends ExtensionAdaptor {
                 extensionHook.addProxyListener(proxyListener);
 
                 ExtensionPopupMenu samlMenu = new ExtensionPopupMenu("SAML Actions");
-                ExtensionPopupMenuItem samlResendMenuItem = new SAMLResendMenuItem("Resend...");
+                ExtensionPopupMenuItem samlResendMenuItem = new SAMLResendMenuItem(SamlI18n.getMessage("saml.popup.view_resend"));
 
                 samlMenu.add(samlResendMenuItem);
                 extensionHook.getHookMenu().addPopupMenuItem(samlMenu);
 
-                JMenuItem samlActiveEditorMenu = new JMenuItem("SAML Settings");
+                JMenuItem samlActiveEditorMenu = new JMenuItem(SamlI18n.getMessage("saml.toolmenu.settings"));
                 samlActiveEditorMenu.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
