@@ -11,6 +11,5 @@ public final class SamlExtensionIntegrationTestSuite {
     @BeforeClass
     public static void initialize() throws Exception {
         TestConstants.initConstants();
-        ZAP.main(new String[]{"-cmd"});
     }
 }

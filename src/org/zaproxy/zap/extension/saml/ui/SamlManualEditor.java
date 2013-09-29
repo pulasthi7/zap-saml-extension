@@ -25,11 +25,14 @@ public class SamlManualEditor extends JFrame {
     private JScrollPane msgScrollPane;
     private JScrollPane attribScrollPane;
 
+    private boolean msgUpdating;
+
 
     /**
      * Create the frame.
      */
     public SamlManualEditor(final SAMLMessage samlMessage) {
+        setTitle(SamlI18n.getMessage("saml.editor.title"));
         this.samlMessage = samlMessage;
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(50, 50, 800, 700);
@@ -74,6 +77,13 @@ public class SamlManualEditor extends JFrame {
         btnResend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
+                //wait till the message is updated
+                while (msgUpdating){
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
                 try {
                     SAMLResender.resendMessage(SamlManualEditor.this.samlMessage.getChangedMessage());
                     updateResponse(SamlManualEditor.this.samlMessage.getChangedMessage());
@@ -122,6 +132,7 @@ public class SamlManualEditor extends JFrame {
         msgPane.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                msgUpdating = true;
             }
 
             @Override
@@ -129,6 +140,7 @@ public class SamlManualEditor extends JFrame {
                 samlMessage.setSamlMessageString(msgPane.getText());
                 //todo: check for validity
                 updateFields();
+                msgUpdating = false;
             }
         });
 
@@ -160,11 +172,13 @@ public class SamlManualEditor extends JFrame {
         txtRelayStateValue.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                msgUpdating = true;
             }
 
             @Override
             public void focusLost(FocusEvent e) {
                 samlMessage.setRelayState(txtRelayStateValue.getText());
+                msgUpdating = false;
             }
         });
         attributesPane.add(relayStatePane);
@@ -189,12 +203,14 @@ public class SamlManualEditor extends JFrame {
             txtValue.addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent e) {
+                    msgUpdating = true;
                 }
 
                 @Override
                 public void focusLost(FocusEvent e) {
                     samlMessage.changeAttributeValueTo(attribute.getName(), txtValue.getText());
-                    updateFields();
+                    msgPane.setText(samlMessage.getSamlMessageString());
+                    msgUpdating = false;
                 }
             });
             attributesPane.add(sPane);

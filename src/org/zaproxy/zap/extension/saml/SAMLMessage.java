@@ -240,8 +240,11 @@ public class SAMLMessage {
                     newParamBuilder.append("&");  //add '&' between params for separation
                 }
                 paramIndex++;
+            }  //todo if paramindex>0
+
+            if(httpMessage.getUrlParams().size()>0){
+                httpMessage.getRequestHeader().getURI().setEscapedQuery(newParamBuilder.toString());
             }
-            httpMessage.getRequestHeader().getURI().setEscapedQuery(newParamBuilder.toString());
 
             newParamBuilder = new StringBuilder();
             paramIndex = 0;
@@ -261,6 +264,7 @@ public class SAMLMessage {
                 paramIndex++;
             }
             httpMessage.setRequestBody(newParamBuilder.toString());
+            httpMessage.getRequestHeader().setContentLength(newParamBuilder.length());
         } catch (UnsupportedEncodingException e) {
             log.warn("Unsupported encoding.", e);
         } catch (URIException e) {

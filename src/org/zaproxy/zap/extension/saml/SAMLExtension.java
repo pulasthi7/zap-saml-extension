@@ -58,7 +58,7 @@ public class SAMLExtension extends ExtensionAdaptor {
                 samlActiveEditorMenu.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        SamlExtentionSettingsUI settingUI = new SamlExtentionSettingsUI(proxyListener);
+                        SamlExtentionSettingsUI settingUI = new SamlExtentionSettingsUI();
                         settingUI.setVisible(true);
                     }
                 });

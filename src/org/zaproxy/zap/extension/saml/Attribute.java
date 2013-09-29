@@ -134,10 +134,7 @@ public class Attribute {
         if (o == null || getClass() != o.getClass()) return false;
 
         Attribute attribute = (Attribute) o;
-
-        if (!name.equals(attribute.name)) return false;
-
-        return true;
+        return name.equals(attribute.name);
     }
 
     @Override

@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 
 public class AddAttributeUI extends JFrame {
 
-    private JPanel contentPane;
     private JTextField textFieldAttributeName;
     private JTextField textFieldViewName;
     private JTextField textFieldXpath;
@@ -28,8 +27,8 @@ public class AddAttributeUI extends JFrame {
     public AddAttributeUI(AttributeListener l) {
         this.attributeListener = l;
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setBounds(100, 100, 400, 300);
-        contentPane = new JPanel();
+        setBounds(100, 100, 400, 250);
+        JPanel contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
@@ -97,16 +96,16 @@ public class AddAttributeUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String error = "";
                 if (textFieldAttributeName.getText().equals("")) {
-                    error = SamlI18n.getMessage("saml.addattrib.error.noname");
+                    error = SamlI18n.getMessage("saml.addattrib.error.noname")+"\n";
                 }
                 if (textFieldViewName.getText().equals("")) {
-                    error += SamlI18n.getMessage("saml.addattrib.error.noviewname");
+                    error += SamlI18n.getMessage("saml.addattrib.error.noviewname")+"\n";
                 }
                 if (textFieldViewName.getText().length() > 30) {
-                    error += SamlI18n.getMessage("saml.addattrib.error.longviewname");
+                    error += SamlI18n.getMessage("saml.addattrib.error.longviewname")+"\n";
                 }
                 if (textFieldXpath.getText().equals("")) {
-                    error += SamlI18n.getMessage("saml.addattrib.error.noxpath");
+                    error += SamlI18n.getMessage("saml.addattrib.error.noxpath")+"\n";
                 }
 
                 //validate xpath expression
@@ -115,7 +114,7 @@ public class AddAttributeUI extends JFrame {
                 try {
                     XPathExpression expression = xpath.compile(textFieldXpath.getText());
                 } catch (XPathExpressionException e1) {
-                    error += SamlI18n.getMessage("saml.addattrib.error.invalidxpath");
+                    error += SamlI18n.getMessage("saml.addattrib.error.invalidxpath")+"\n";
                 }
 
                 if (!error.equals("")) {

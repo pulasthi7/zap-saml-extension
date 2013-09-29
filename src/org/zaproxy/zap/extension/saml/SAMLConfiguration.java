@@ -52,7 +52,7 @@ public class SAMLConfiguration implements AttributeListener {
 
         if (!confFile.exists()) {
             File defaultConfFile = new File(SAMLConfiguration.class.getResource(SAML_CONF_FILE).getFile());
-            if (defaultConfFile.exists()) {
+            if (!defaultConfFile.exists()) {
                 throw new SAMLException("Configuration file not found");
             }
 

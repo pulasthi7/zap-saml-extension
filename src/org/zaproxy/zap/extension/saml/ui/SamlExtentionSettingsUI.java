@@ -27,7 +27,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
     /**
      * Create the frame.
      */
-    public SamlExtentionSettingsUI(final SAMLProxyListener listener) {
+    public SamlExtentionSettingsUI() {
         configuration = SAMLConfiguration.getInstance();
         setTitle(SamlI18n.getMessage("saml.toolmenu.settings"));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -74,16 +74,14 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         btnSaveChanges.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                configuration.setAutochangeEnabled(chckbxEnablePassiveChanger.isSelected());
-                configuration.setXSWEnabled(chckbxRemoveMessageSignatures.isSelected());
-                configuration.setValidationEnabled(chckbxValidateAttributeValue.isSelected());
-                boolean success = configuration.saveConfiguration();
+                boolean success = saveChanges();
                 if (success) {
-                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.settings.messages.saved"), SamlI18n.getMessage("saml.settings.messages.success"),
+                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.settings" +
+                            ".messages.saved"), SamlI18n.getMessage("saml.settings.messages.success"),
                             JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.settings.messages.notsaved"), SamlI18n.getMessage("saml.settings.messages.failed"),
+                    JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.settings" +
+                            ".messages.notsaved"), SamlI18n.getMessage("saml.settings.messages.failed"),
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -98,15 +96,7 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
                         SamlI18n.getMessage("saml.editor.msg.confirmreset"), SamlI18n.getMessage("saml.settings.messages.confirm"),
                         JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
-                    try {
-                        SAMLConfiguration.getInstance().initialize();
-                        initAttributes();
-                    } catch (SAMLException e1) {
-                        JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.editor.msg.resetfailed"),
-                                SamlI18n.getMessage("saml.settings.messages.failed"),
-                                JOptionPane.ERROR_MESSAGE);
-                        log.error("Resetting settings failed");
-                    }
+                    resetChanges();
                 }
             }
         });
@@ -116,7 +106,17 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SamlExtentionSettingsUI.this.setVisible(false);
+                int response = JOptionPane.showConfirmDialog(SamlExtentionSettingsUI.this,
+                        "Do You want to save changes before exit?", SamlI18n.getMessage("saml.settings.messages" +
+                        ".confirm"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    saveChanges();
+                    SamlExtentionSettingsUI.this.setVisible(false);
+                } else if(response==JOptionPane.NO_OPTION){
+                    resetChanges();
+                    SamlExtentionSettingsUI.this.setVisible(false);
+                }
             }
         });
         footerPanel.add(btnExit);
@@ -251,6 +251,25 @@ public class SamlExtentionSettingsUI extends JFrame implements PassiveAttributeC
             });
             allAttributePanel.add(btnRemoveAttribute, gridBagConstraints);
             gridBagConstraints.gridy++;
+        }
+    }
+
+    private boolean saveChanges(){
+        configuration.setAutochangeEnabled(chckbxEnablePassiveChanger.isSelected());
+        configuration.setXSWEnabled(chckbxRemoveMessageSignatures.isSelected());
+        configuration.setValidationEnabled(chckbxValidateAttributeValue.isSelected());
+        return configuration.saveConfiguration();
+    }
+
+    private void resetChanges(){
+        try {
+            SAMLConfiguration.getInstance().initialize();
+            initAttributes();
+        } catch (SAMLException e1) {
+            JOptionPane.showMessageDialog(SamlExtentionSettingsUI.this, SamlI18n.getMessage("saml.editor.msg.resetfailed"),
+                    SamlI18n.getMessage("saml.settings.messages.failed"),
+                    JOptionPane.ERROR_MESSAGE);
+            log.error("Resetting settings failed");
         }
     }
 
